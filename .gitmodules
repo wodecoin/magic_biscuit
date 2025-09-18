@@ -1,0 +1,3 @@
+[submodule "mm32f5270_nano_frame"]
+	path = mm32f5270_nano_frame
+	url = https://github.com/wodecoin/mm32f5270_nano_frame.git
