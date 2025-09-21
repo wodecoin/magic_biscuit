@@ -448,6 +448,13 @@
         </Group>
         <Group>
           <GroupName>doc</GroupName>
+          <Files>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\README.md</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>HAL_LIB</GroupName>

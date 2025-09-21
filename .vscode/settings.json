@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "platform.h": "c",
+        "hal_conf.h": "c"
+    }
+}
