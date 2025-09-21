@@ -444,6 +444,16 @@
               <FileType>1</FileType>
               <FilePath>..\mm32f5270_nano_frame\base\plat\platform.c</FilePath>
             </File>
+            <File>
+              <FileName>mm32_qspi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mm32f5270_nano_frame\base\plat\mm32_qspi.c</FilePath>
+            </File>
+            <File>
+              <FileName>mm32_soft_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mm32f5270_nano_frame\base\plat\mm32_soft_i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
