@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,CUSTOM_HSE_VAL, USE_APP,LVGL_RTTHREAD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\mm32f5270_nano_frame\base\library\CMSIS\Core\Include;..\mm32f5270_nano_frame\base\library\MM32F5270\HAL_Lib\Inc;..\mm32f5270_nano_frame\base\library\MM32F5270\Include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\libcpu\arm\cortex-m33;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\components\finsh;..\mm32f5270_nano_frame\base\plat;..\mm32f5270_nano_frame\base\core;..\mm32f5270_nano_frame\base\3rd_party\lvgl_rtthread;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\bsp\_template;..\user_app</IncludePath>
+              <IncludePath>..\mm32f5270_nano_frame\base\library\CMSIS\Core\Include;..\mm32f5270_nano_frame\base\library\MM32F5270\HAL_Lib\Inc;..\mm32f5270_nano_frame\base\library\MM32F5270\Include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\libcpu\arm\cortex-m33;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\components\finsh;..\mm32f5270_nano_frame\base\plat;..\mm32f5270_nano_frame\base\core;..\mm32f5270_nano_frame\base\3rd_party\lvgl_rtthread;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\bsp\_template;..\user_app;..\user_app\ui\fonts;..\user_app\ui;..\user_app\ui\components;..\user_app\ui\screens;..\3rd_party\ulog;..\3rd_party\lvgl_rtthread</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,6 +418,31 @@
               <FileName>amoled_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mm32f5270_nano_frame\base\dev\amoled_driver.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ui</GroupName>
+          <Files>
+            <File>
+              <FileName>ui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\ui.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_Screen1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\screens\ui_Screen1.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_comp_hook.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\components\ui_comp_hook.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_helpers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\ui_helpers.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -812,6 +837,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>ulog</GroupName>
+          <Files>
+            <File>
+              <FileName>ulog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3rd_party\ulog\ulog.c</FilePath>
+            </File>
+            <File>
+              <FileName>console_be.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3rd_party\ulog\backend\console_be.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::LVGL</GroupName>
         </Group>
       </Groups>
@@ -822,6 +862,12 @@
     <apis/>
     <components>
       <component Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential" Cvendor="LVGL" Cversion="8.4.0">
+        <package name="lvgl" schemaVersion="1.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="8.4.0"/>
+        <targetInfos>
+          <targetInfo name="app"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Extra Themes" Cvendor="LVGL" Cversion="8.4.0" condition="LVGL-Essential">
         <package name="lvgl" schemaVersion="1.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="8.4.0"/>
         <targetInfos>
           <targetInfo name="app"/>

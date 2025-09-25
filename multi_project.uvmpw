@@ -9,12 +9,12 @@
 
   <project>
     <PathAndName>.\app_mdk\app.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
+    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>
     <PathAndName>.\mm32f5270_nano_frame\base\mdk\framework\framework.uvprojx</PathAndName>
-    <NodeIsActive>1</NodeIsActive>
-    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
 </ProjectWorkspace>

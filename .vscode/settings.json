@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "platform.h": "c",
-        "hal_conf.h": "c"
-    }
+        "hal_conf.h": "c",
+        "amoled_touch.h": "c"
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }

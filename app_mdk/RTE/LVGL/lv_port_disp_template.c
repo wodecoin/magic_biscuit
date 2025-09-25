@@ -16,12 +16,12 @@
  *      DEFINES
  *********************/
 #ifndef MY_DISP_HOR_RES
-    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen width, default value 320 is used for now.
+//    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen width, default value 320 is used for now.
     #define MY_DISP_HOR_RES    460
 #endif
 
 #ifndef MY_DISP_VER_RES
-    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen height, default value 240 is used for now.
+//    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen height, default value 240 is used for now.
     #define MY_DISP_VER_RES    460
 #endif
 
@@ -84,8 +84,8 @@ void lv_port_disp_init(void)
 
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf_dsc_1;
-    static lv_color_t buf_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
-    lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
+    static lv_color_t buf_1[MY_DISP_HOR_RES * 2];                          /*A buffer for 10 rows*/
+    lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * 2);   /*Initialize the display buffer*/
 
 //    /* Example for 2) */
 //    static lv_disp_draw_buf_t draw_buf_dsc_2;
@@ -134,11 +134,12 @@ void lv_port_disp_init(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#include "platform.h"
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
     /*You code here*/
+	amoled_init();
 }
 
 volatile bool disp_flush_enabled = true;
@@ -164,16 +165,18 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 {
     if(disp_flush_enabled) {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
-
-        int32_t x;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            for(x = area->x1; x <= area->x2; x++) {
-                /*Put a pixel to the display. For example:*/
-                /*put_px(x, y, *color_p)*/
-                color_p++;
-            }
-        }
+//        int32_t x;
+//        int32_t y;
+//        for(y = area->y1; y <= area->y2; y++) {
+//            for(x = area->x1; x <= area->x2; x++) {
+//                /*Put a pixel to the display. For example:*/
+//                /*put_px(x, y, *color_p)*/
+//								
+//                color_p++;
+//            }
+//        }
+				extern void amoled_flush_area(const lv_area_t * area, lv_color_t * color_p);
+				amoled_flush_area(area, color_p);
     }
 
     /*IMPORTANT!!!

@@ -12,8 +12,8 @@
 
 void lv_user_gui_init(void)
 {
-//    extern void ui_init(void);
-//    ui_init();
+    extern void ui_init(void);
+    ui_init();
 }
 
 #endif /* __RTTHREAD__ */
