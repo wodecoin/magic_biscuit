@@ -873,12 +873,6 @@
           <targetInfo name="app"/>
         </targetInfos>
       </component>
-      <component Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Libs GIF" Cvendor="LVGL" Cversion="8.4.0" condition="LVGL-Essential">
-        <package name="lvgl" schemaVersion="1.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="8.4.0"/>
-        <targetInfos>
-          <targetInfo name="app"/>
-        </targetInfos>
-      </component>
       <component Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Libs PNG" Cvendor="LVGL" Cversion="8.4.0" condition="LVGL-Essential">
         <package name="lvgl" schemaVersion="1.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="8.4.0"/>
         <targetInfos>

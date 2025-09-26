@@ -351,16 +351,16 @@
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 1
-#define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_14 0
+#define LV_FONT_MONTSERRAT_16 0
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
 #define LV_FONT_MONTSERRAT_24 0
 #define LV_FONT_MONTSERRAT_26 0
 #define LV_FONT_MONTSERRAT_28 0
-#define LV_FONT_MONTSERRAT_30 0
+#define LV_FONT_MONTSERRAT_30 1
 #define LV_FONT_MONTSERRAT_32 0
 #define LV_FONT_MONTSERRAT_34 0
 #define LV_FONT_MONTSERRAT_36 0
@@ -387,7 +387,7 @@
 #define LV_FONT_CUSTOM_DECLARE
 
 /*Always set a default font*/
-#define LV_FONT_DEFAULT &lv_font_montserrat_14
+#define LV_FONT_DEFAULT &lv_font_montserrat_30
 
 /*Enable handling large font and/or fonts with a lot of characters.
  *The limit depends on the font size, font face and bpp.
@@ -522,25 +522,25 @@
     #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 #endif  /*LV_USE_CALENDAR*/
 
-#define LV_USE_CHART      1
+#define LV_USE_CHART      0
 
-#define LV_USE_COLORWHEEL 1
+#define LV_USE_COLORWHEEL 0
 
-#define LV_USE_IMGBTN     1
+#define LV_USE_IMGBTN     0
 
 #define LV_USE_KEYBOARD   1
 
-#define LV_USE_LED        1
+#define LV_USE_LED        0
 
-#define LV_USE_LIST       1
+#define LV_USE_LIST       0
 
-#define LV_USE_MENU       1
+#define LV_USE_MENU       0
 
-#define LV_USE_METER      1
+#define LV_USE_METER      0
 
-#define LV_USE_MSGBOX     1
+#define LV_USE_MSGBOX     0
 
-#define LV_USE_SPAN       1
+#define LV_USE_SPAN       0
 #if LV_USE_SPAN
     /*A line text can contain maximum num of span descriptor */
     #define LV_SPAN_SNIPPET_STACK_SIZE 64
@@ -548,13 +548,13 @@
 
 #define LV_USE_SPINBOX    1
 
-#define LV_USE_SPINNER    1
+#define LV_USE_SPINNER    0
 
-#define LV_USE_TABVIEW    1
+#define LV_USE_TABVIEW    0
 
-#define LV_USE_TILEVIEW   1
+#define LV_USE_TILEVIEW   0
 
-#define LV_USE_WIN        1
+#define LV_USE_WIN        0
 
 /*-----------
  * Themes
