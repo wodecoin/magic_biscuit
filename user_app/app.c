@@ -22,6 +22,10 @@ void app(void)
     // Q_CREATE_THREAD(ws2812,            1024*1,              26,          5);
     // Q_CREATE_THREAD(key,               1024*1,              26,          5);
     // Q_CREATE_THREAD(flash, 1024 * 1 + 512, 26, 5);
+    Q_CREATE_THREAD(lvgl, 1024 * 10, 26, 5);
+    rt_thread_mdelay(2000);
+    Q_CREATE_THREAD(deal, 1024 * 2, 26, 5);
+    Q_CREATE_THREAD(uart, 1024, 26, 5);
 
     for (;;)
     {

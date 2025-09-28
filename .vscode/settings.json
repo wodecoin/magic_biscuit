@@ -2,7 +2,22 @@
     "files.associations": {
         "platform.h": "c",
         "hal_conf.h": "c",
-        "amoled_touch.h": "c"
+        "amoled_touch.h": "c",
+        "app.h": "c",
+        "tlv_protocol.h": "c",
+        "rtthread.h": "c",
+        "ui_screen1.h": "c",
+        "ui.h": "c",
+        "algorithm": "c",
+        "optional": "c",
+        "type_traits": "c",
+        "xtr1common": "c",
+        "xutility": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "limits": "c",
+        "xmemory": "c",
+        "ulog.h": "c"
     },
     "cmake.ignoreCMakeListsMissing": true
 }

@@ -10,7 +10,7 @@
  */
 
 #ifdef LVGL_RTTHREAD
-#define LV_TICK_PERIOD_MS 5  // 每隔 5ms 更新一次 LVGL tick
+#define LV_TICK_PERIOD_MS 5 // 每隔 5ms 更新一次 LVGL tick
 
 #include <lvgl.h>
 #include <rtthread.h>
@@ -23,7 +23,7 @@
 #include <rtdbg.h>
 
 #ifndef PKG_LVGL_THREAD_STACK_SIZE
-#define PKG_LVGL_THREAD_STACK_SIZE 4096
+#define PKG_LVGL_THREAD_STACK_SIZE 1024 * 10
 #endif /* PKG_LVGL_THREAD_STACK_SIZE */
 
 #ifndef PKG_LVGL_THREAD_PRIO
@@ -34,6 +34,8 @@
 #define PKG_LVGL_DISP_REFR_PERIOD 33
 #endif /* PKG_LVGL_DISP_REFR_PERIOD */
 
+#define LV_UI_UPDATE_PERIOD 20 // UI刷新周期
+static rt_timer_t lv_ui_timer;
 extern void lv_port_disp_init(void);
 extern void lv_port_indev_init(void);
 extern void lv_user_gui_init(void);
@@ -68,6 +70,7 @@ static void lv_tick_timer_cb(void *parameter)
     /* 增加 LVGL tick */
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
+extern void lv_ui_deal(uint16_t ms);
 void lv_port_tick_init(void)
 {
     /* 创建周期性定时器 */
@@ -77,19 +80,20 @@ void lv_port_tick_init(void)
                                     LV_TICK_PERIOD_MS,
                                     RT_TIMER_FLAG_PERIODIC);
 
-    if(lv_tick_timer != RT_NULL)
+    if (lv_tick_timer != RT_NULL)
     {
         rt_timer_start(lv_tick_timer);
     }
+
 }
 
-static void lvgl_thread_entry(void *parameter)
+void thread_lvgl_task_entry(void *parameter)
 {
 #if LV_USE_LOG
     lv_log_register_print_cb(lv_rt_log);
 #endif /* LV_USE_LOG */
     lv_init();
-		lv_port_tick_init();
+    lv_port_tick_init();
     lv_port_disp_init();
     lv_port_indev_init();
     lv_user_gui_init();
@@ -101,7 +105,7 @@ static void lvgl_thread_entry(void *parameter)
     /* handle the tasks of LVGL */
     while (1)
     {
-        lv_timer_handler();
+				lv_ui_deal(PKG_LVGL_DISP_REFR_PERIOD);
         rt_thread_mdelay(PKG_LVGL_DISP_REFR_PERIOD);
     }
 }
@@ -110,7 +114,7 @@ static int lvgl_thread_init(void)
 {
     rt_err_t err;
 
-    err = rt_thread_init(&lvgl_thread, "LVGL", lvgl_thread_entry, RT_NULL,
+    err = rt_thread_init(&lvgl_thread, "LVGL", thread_lvgl_task_entry, RT_NULL,
                          &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 10);
     if (err != RT_EOK)
     {
@@ -122,8 +126,6 @@ static int lvgl_thread_init(void)
     return 0;
 }
 
-
-
-INIT_ENV_EXPORT(lvgl_thread_init);
+//INIT_ENV_EXPORT(lvgl_thread_init);
 
 #endif /*__RTTHREAD__*/

@@ -2,18 +2,19 @@
 #include "lvgl.h"
 #include "amoled_touch.h"
 #define USE_LINE_MODE 1
-#define AMOLED_MAX_WIDTH   460
-#define AMOLED_MAX_HEIGHT  460
+#define AMOLED_MAX_WIDTH 460
+#define AMOLED_MAX_HEIGHT 460
 #define LOG_TAG "lvgl"
 #define LOG_LVL LOG_LVL_DBG
 extern void amoled_write_block(uint16_t x, uint16_t y,
-                        uint16_t width, uint16_t height,
-                        const uint16_t *color, uint32_t buf_size);
+                               uint16_t width, uint16_t height,
+                               const uint16_t *color, uint32_t buf_size);
 
 void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
 {
-    if (!area || !color_p) return;
-//    LOG_I("area: x1=%d, y1=%d, x2=%d, y2=%d", area->x1, area->y1, area->x2, area->y2);
+    if (!area || !color_p)
+        return;
+    //    LOG_I("area: x1=%d, y1=%d, x2=%d, y2=%d", area->x1, area->y1, area->x2, area->y2);
 
     // 裁剪区域，防止越界
     int32_t x1 = (area->x1 < 0) ? 0 : area->x1;
@@ -25,28 +26,32 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
     uint16_t height = y2 - y1 + 1;
 
     // 检查宽度和高度
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0)
+    {
         LOG_E("Invalid area dimensions: width=%d, height=%d", width, height);
         return;
     }
 
-//    LOG_I("color_p address: %p", color_p);
-//    for (int i = 0; i < 5 && i < width * height; i++) { // 打印前 5 个像素或全部（取最小值）
-//        rt_kprintf("color_p[%d]: 0x%04x ", i, ((uint16_t*)color_p)[i]);
-//    }
-//		LOG_I(" ");
+    //    LOG_I("color_p address: %p", color_p);
+    //    for (int i = 0; i < 5 && i < width * height; i++) { // 打印前 5 个像素或全部（取最小值）
+    //        rt_kprintf("color_p[%d]: 0x%04x ", i, ((uint16_t*)color_p)[i]);
+    //    }
+    //		LOG_I(" ");
 
-		// 静态互斥锁，初始化一次
+    // 静态互斥锁，初始化一次
     static rt_mutex_t disp_mutex = NULL;
-    if (disp_mutex == NULL) {
+    if (disp_mutex == NULL)
+    {
         disp_mutex = rt_mutex_create("disp_mutex", RT_IPC_FLAG_PRIO);
-        if (disp_mutex == RT_NULL) {
+        if (disp_mutex == RT_NULL)
+        {
             LOG_E("Failed to create disp_mutex");
             return;
         }
     }
-		// 获取互斥锁
-    if (rt_mutex_take(disp_mutex, RT_WAITING_FOREVER) != RT_EOK) {
+    // 获取互斥锁
+    if (rt_mutex_take(disp_mutex, RT_WAITING_FOREVER) != RT_EOK)
+    {
         LOG_E("Failed to take disp_mutex");
         return;
     }
@@ -56,29 +61,60 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
         y1,
         width,
         height,
-        (uint16_t*)color_p,
-        height * width * 2
-    );
+        (uint16_t *)color_p,
+        height * width * 2);
 
     // 释放互斥锁
-    if (rt_mutex_release(disp_mutex) != RT_EOK) {
+    if (rt_mutex_release(disp_mutex) != RT_EOK)
+    {
         LOG_E("Failed to release disp_mutex");
+    }
+}
+#define amoled_te_port GPIOB
+#define amoled_te_pin GPIO_Pin_2 // TE (可选)
+
+void te_wait_cb(lv_disp_drv_t *disp_drv)
+{
+    uint32_t timeout = 20000;   // 20ms超时 (适用于60Hz，约16ms每帧)
+    uint32_t delay_us = 2;      // 减少到2us以实现更精细的轮询
+    static uint8_t last_te = 0; // 跟踪上一次TE状态以检测边沿
+    uint8_t curr_te;
+
+    // 使用更精细的粒度轮询TE上升沿
+    while (timeout > 0)
+    {
+        curr_te = GPIO_ReadInputDataBit(amoled_te_port, amoled_te_pin);
+        if (curr_te == 1 && last_te == 0)
+        { // 检测上升沿
+            // 等待V-Blank稳定 (根据AMOLED数据手册调整，例如20-50us)
+            rt_hw_us_delay(10); // 增加延迟以确保稳定性
+            break;              // 在检测到上升沿时退出
+        }
+        last_te = curr_te;
+        rt_hw_us_delay(delay_us);
+        timeout -= delay_us;
+    }
+
+    if (timeout <= 0)
+    {
+        LOG_E("TE poll timeout!");                                 // TE轮询超时
+        rt_kprintf("TE state: %d (last: %d)\n", curr_te, last_te); // 调试TE状态
     }
 }
 
 #include "lvgl.h"
 #include "rtthread.h"
 
-#define TEST_WIDTH  40
+#define TEST_WIDTH 40
 #define TEST_HEIGHT 40
 
 static uint16_t test_buf[TEST_WIDTH * TEST_HEIGHT];
 
-static void msh_amoled_test(int argc, char** argv)
+static void msh_amoled_test(int argc, char **argv)
 {
     // 初始化屏幕
     amoled_init();
-//    amoled_clear(0x0000); // 黑色
+    //    amoled_clear(0x0000); // 黑色
 
     // 填充颜色（示例：红色）
     for (int i = 0; i < TEST_WIDTH * TEST_HEIGHT; i++)
@@ -94,10 +130,10 @@ static void msh_amoled_test(int argc, char** argv)
     area.y2 = 50 + TEST_HEIGHT - 1;
 
     // 调用 flush_area
-    amoled_flush_area(&area, (lv_color_t*)test_buf);
-		rt_thread_mdelay(1);
+    amoled_flush_area(&area, (lv_color_t *)test_buf);
+    rt_thread_mdelay(1);
 
-//    rt_kprintf("amoled_flush_area test done.\r\n");
+    //    rt_kprintf("amoled_flush_area test done.\r\n");
 }
 
 MSH_CMD_EXPORT(msh_amoled_test, Test AMOLED flush_area with a small rectangle);
@@ -105,41 +141,42 @@ MSH_CMD_EXPORT(msh_amoled_test, Test AMOLED flush_area with a small rectangle);
 void amoled_touchpad_init(void)
 {
     /*Your code comes here*/
-      // 若i2c_config功能需保留，请在平台初始化阶段调用
+    // 若i2c_config功能需保留，请在平台初始化阶段调用
     uint8_t irq_ctl = CST820_IRQ_CTL_EN_CHANGE;
     i2c_write_bytes(CST820_I2C_ADDR, CST820_REG_IRQ_CTL, &irq_ctl, 1); // 设置触摸状态变化发低脉冲
 }
 
-void amoled_touch_get_xy(lv_coord_t * x, lv_coord_t * y)
+void amoled_touch_get_xy(lv_coord_t *x, lv_coord_t *y)
 {
     /*Your code comes here*/
-        uint8_t xy_buf[4] = {0};
-        i2c_read_bytes(CST820_I2C_ADDR, CST820_REG_XPOS_H, xy_buf, 4);
-        // 3. 解析12位坐标（文档1-30、1-39、1-48、1-54）
-        uint8_t xh = xy_buf[0], xl = xy_buf[1];
-        uint8_t yh = xy_buf[2], yl = xy_buf[3];
-        lv_coord_t curr_x = CST820_GET_XPOS(xh, xl); // 组合X坐标（高4位<<8 + 低8位）
-        lv_coord_t curr_y = CST820_GET_YPOS(yh, yl); // 组合Y坐标
+    uint8_t xy_buf[4] = {0};
+    i2c_read_bytes(CST820_I2C_ADDR, CST820_REG_XPOS_H, xy_buf, 4);
+    // 3. 解析12位坐标（文档1-30、1-39、1-48、1-54）
+    uint8_t xh = xy_buf[0], xl = xy_buf[1];
+    uint8_t yh = xy_buf[2], yl = xy_buf[3];
+    lv_coord_t curr_x = CST820_GET_XPOS(xh, xl); // 组合X坐标（高4位<<8 + 低8位）
+    lv_coord_t curr_y = CST820_GET_YPOS(yh, yl); // 组合Y坐标
 
-        // 4. 更新缓存并输出坐标
-        if(x != NULL) *x = curr_x;
-        if(y != NULL) *y = curr_y;
-                rt_kprintf("xpos 0x%02X,0x%02X\r\n",curr_x,curr_y);
+    // 4. 更新缓存并输出坐标
+    if (x != NULL)
+        *x = curr_x;
+    if (y != NULL)
+        *y = curr_y;
+    rt_kprintf("xpos 0x%02X,0x%02X\r\n", curr_x, curr_y);
 }
 
 bool amoled_touchpad_is_pressed(void)
 {
     /*Your code comes here*/
-        uint8_t reg_buf[2] = {0};
+    uint8_t reg_buf[2] = {0};
     i2c_read_bytes(CST820_I2C_ADDR, CST820_REG_FINGER_NUM, reg_buf, 2);
 
-
     // 3. 解析文档寄存器数据
-    uint8_t finger_num = reg_buf[0];          // 解析手指个数（文档1-14）
+    uint8_t finger_num = reg_buf[0];               // 解析手指个数（文档1-14）
     uint8_t event_flag = (reg_buf[1] >> 6) & 0x03; // 解析触摸状态（文档1-23）
 
     // 4. 按压判定：1个手指 + 按下（00）或保持/移动（10）→ 映射为LV_INDEV_STATE_PRESSED
-    if (finger_num == CST820_FINGER_NUM_ONE ) //&& (event_flag == CST820_EVENT_PRESS || event_flag == CST820_EVENT_HOLD_MOVE)
+    if (finger_num == CST820_FINGER_NUM_ONE) //&& (event_flag == CST820_EVENT_PRESS || event_flag == CST820_EVENT_HOLD_MOVE)
     {
         return true;
     }
@@ -148,5 +185,4 @@ bool amoled_touchpad_is_pressed(void)
     {
         return false;
     }
- 
 }
