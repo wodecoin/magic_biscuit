@@ -64,8 +64,8 @@ extern "C"
         TLV_MODE_TEMP = 0x84,    // 模式温度
         TLV_MODE_POT = 0x85,
         TLV_AREA1_TEMP = 0x86, // 区域1温度
-        TLV_KPA = 0x8B,        // 大气压
-        TLV_RH = 0x8C,         // 湿度
+        TLV_KPA = 0x8D,        // 大气压
+        TLV_RH = 0x8E,         // 湿度
         TLV_SW = 0x88,         // 开关
     } air_fryer_type_t;
     typedef enum

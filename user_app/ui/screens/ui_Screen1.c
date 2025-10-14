@@ -465,7 +465,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_Label16, -128);
     lv_obj_set_y(ui_Label16, 148);
     lv_obj_set_align(ui_Label16, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label16, "   °C");
+    lv_label_set_text(ui_Label16, "  °C");
     lv_obj_set_style_text_font(ui_Label16, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_paLabel = lv_label_create(ui_Container2);
@@ -480,7 +480,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_Label17, -128);
     lv_obj_set_y(ui_Label17, 177);
     lv_obj_set_align(ui_Label17, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label17, "  kPa");
+    lv_label_set_text(ui_Label17, " kPa");
     lv_obj_set_style_text_font(ui_Label17, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_tempLabel = lv_label_create(ui_Container2);
@@ -497,7 +497,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_Label18, -130);
     lv_obj_set_y(ui_Label18, 210);
     lv_obj_set_align(ui_Label18, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label18, "  %");
+    lv_label_set_text(ui_Label18, " %");
     lv_obj_set_style_text_font(ui_Label18, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_TempAdd, ui_event_TempAdd, LV_EVENT_ALL, NULL);

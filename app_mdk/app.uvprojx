@@ -509,6 +509,11 @@
               <FileType>1</FileType>
               <FilePath>..\mm32f5270_nano_frame\base\plat\mm32_soft_i2c.c</FilePath>
             </File>
+            <File>
+              <FileName>mm32_soft_i2c_v1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mm32f5270_nano_frame\base\plat\mm32_soft_i2c_v1.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

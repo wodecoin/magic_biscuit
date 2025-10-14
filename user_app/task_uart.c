@@ -18,6 +18,24 @@ static display_msg_t dis_pool[QUEUE_CNT];
 #define LOG_TAG "BT_REV"
 #define LOG_LVL LOG_LVL_DBG
 #include <ulog.h>
+static uint32_t tlv_get_u32(const tlv_t *tlv)
+{
+    uint32_t val = 0;
+    for (int j = 0; j < tlv->length && j < 4; j++)
+    {
+        val = (val << 8) | tlv->value[j];  // 高字节在前
+    }
+    return val;
+}
+static uint32_t tlv_get_u32_le(const tlv_t *tlv)
+{
+    uint32_t val = 0;
+    for (int j = tlv->length - 1; j >= 0; j--)
+    {
+        val = (val << 8) | tlv->value[j];
+    }
+    return val;
+}
 
 void thread_uart_task_entry(void *parameter)
 {
@@ -39,7 +57,7 @@ void thread_uart_task_entry(void *parameter)
 		{
 			print_hex_buffer("uart4_rev", data.pbuf, data.len);
 			rt_memset(&recv_frame, 0, sizeof(frame_t)); // 清空接收帧
-			if (parse_frame(evt.pbuf, &recv_frame) == 0)
+			if (parse_frame(data.pbuf, &recv_frame) == 0)
 			{
 				if (handle_frame(&recv_frame) == 0)
 				{
@@ -66,22 +84,26 @@ void thread_uart_task_entry(void *parameter)
 					{
 						for (int i = 0; i < recv_frame.tlv_count; i++)
 						{
-							tlv_t *tlv = &recv_frame.tlvs[i];
-							switch (tlv->type)
-							{
-							case TLV_AREA1_TEMP:
-								env.ctl_dev.real_temp = tlv->value[i];
-								break;
-							case TLV_KPA:
-								env.ctl_dev.kpa = tlv->value[i];
-								break;
-							case TLV_RH:
-								env.ctl_dev.rh_value = tlv->value[i];
-								break;
-							default:
-								break;
-							}
+								tlv_t *tlv = &recv_frame.tlvs[i];
+								switch (tlv->type)
+								{
+								case TLV_AREA1_TEMP:
+										env.ctl_dev.real_temp = tlv_get_u32(tlv);
+										break;
+
+								case TLV_KPA:
+										env.ctl_dev.kpa = tlv_get_u32(tlv);
+										break;
+
+								case TLV_RH:
+										env.ctl_dev.rh_value = tlv_get_u32(tlv);
+										break;
+
+								default:
+										break;
+								}
 						}
+
 						dmsg.widget_id = WIDGET_AIR_FRY_DISPLAY;
 						rt_mq_send(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg));
 					}
@@ -145,5 +167,6 @@ static void ui_updata(int argc, char **argv)
 	else
 		rt_kprintf("mq_test: send failed! ret=%d\n", ret);
 }
+
 /* 导出 msh 命令 */
 MSH_CMD_EXPORT(ui_updata, send test message to UI queue);

@@ -121,7 +121,7 @@ void thread_deal_task_entry(void *parameter)
         rt_thread_mdelay(TICK_MS);
         static uint32_t tick_count = 0;
         tick_count += TICK_MS;
-        if (tick_count >= 1000)
+        if (tick_count >= 1500)
         {
             tick_count = 0;
             LOG_D("1s air fry query");
@@ -181,6 +181,7 @@ static void send_query_cmd(uint8_t dev_idx, tlv_t *tlvs, int tlv_count)
     int len = build_frame(&send_frame, FRAME_QUERY_REQ, dev_idx,
                           tlvs, tlv_count, buf);
     print_hex_buffer(TAG, buf, len);
+		UART_SendBytes(UART4, buf, len);
     LOG_I(TAG, "writprint_hex_buffere to BLE");
 }
 
@@ -271,7 +272,7 @@ void lv_ui_deal(uint16_t ms)
     if (tick_last >= 1000)
     {
         tick_last = 0;
-        lv_refresh_area_percent(0, 0, 100, 25);
+        lv_refresh_area_percent(0, 0, 100, 10);
         lv_refresh_area_percent(0, 75, 100, 100);
     }
     lv_timer_handler(); // LVGL渲染
@@ -287,9 +288,9 @@ void ui_update_cb(void *param)
         snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.kpa);
         lv_label_set_text(ui_paLabel, buf);
         snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.real_temp);
-        lv_label_set_text(ui_tempLabel, buf);
-        snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
         lv_label_set_text(ui_humidityLabel, buf);
+        snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
+        lv_label_set_text(ui_tempLabel, buf);
         lv_refresh_area_percent(0, 75, 50, 100); // 刷新1/4左下角
     }
 }
