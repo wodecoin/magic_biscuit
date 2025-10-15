@@ -1,6 +1,6 @@
 #include "app.h"
 #include "ui.h"
-
+#undef LOG_TAG
 #define LOG_TAG "DEAL_TASK"
 #define LOG_LVL LOG_LVL_DBG
 #include <ulog.h>
@@ -21,6 +21,28 @@ void ui_update_cb(void *param);
 void send_ui_event_delayed(rt_uint32_t event, rt_tick_t delay_ms);
 
 display_msg_t dmsg;
+typedef struct
+{
+    uint16_t widget_id;         // 控件 ID
+    uint16_t tlv_type;          // 对应 TLV 类型
+    uint8_t (*get_value)(void); // 获取该控件的值（函数指针）
+    uint16_t delayed_event;     // 延迟更新事件
+    uint16_t delayed_time;      // 延迟时间（ms）
+} widget_tlv_map_t;
+
+// --- 每个控件与TLV、函数的映射表 ---
+static uint8_t get_slider1_value(void) { return lv_slider_get_value(ui_Slider1); }
+static uint8_t get_slider2_value(void) { return lv_slider_get_value(ui_Slider2); }
+
+static const widget_tlv_map_t widget_map[] = {
+    {WIDGET_AIR_FRY_TEMP, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SLIDER1_SCT, 1000},
+    {WIDGET_AIR_FRY_TIMER, TLV_HEAT_TIME, get_slider2_value, EVENT_UPDATA_SLIDER2_SCT, 1000},
+    {WIDGET_AIR_FRY_MODE, TLV_COOK_MODE, NULL, EVENT_UPDATA_MODE_SCT, 1500},
+    {WIDGET_AIR_FRY_START, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SW_SCT, 1500},
+};
+
+#define RT_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 void thread_deal_task_entry(void *parameter)
 {
     ui_msg_t msg;
@@ -29,95 +51,63 @@ void thread_deal_task_entry(void *parameter)
     rt_mq_init(&env.msg_queue,
                "ui_msgq",
                msg_pool,
-               sizeof(ui_msg_t), // 单条消息大小
-               MSG_POOL_SIZE,    // 整个缓冲池大小（字节数）
+               sizeof(ui_msg_t),
+               MSG_POOL_SIZE,
                RT_IPC_FLAG_FIFO);
+
     if (rt_event_init(&env.ui_event, "ui_event", RT_IPC_FLAG_FIFO) != RT_EOK)
-    {
         rt_kprintf("init event failed.\r\n");
-    }
+
     ble_sent_sem = rt_sem_create("blesem", 1, RT_IPC_FLAG_PRIO);
     if (ble_sent_sem == RT_NULL)
-    {
         rt_kprintf("create sem failed\n");
-    }
 
     while (1)
     {
-        /* 阻塞等待消息到来 */
-        result = rt_mq_recv(&env.msg_queue, &msg, sizeof(msg), RT_WAITING_NO); // 阻塞等待 避免打断qspi
+        result = rt_mq_recv(&env.msg_queue, &msg, sizeof(msg), RT_WAITING_NO);
+
         if (result == RT_EOK)
         {
-            LOG_I("widget_id=%d, event=%d, value=%d\n",
-                  msg.widget_id, msg.event, msg.value);
-            tlv_t air_fry_tlvs[3];
-            /* 根据 widget_id 和 event 做处理 */
-            tlv_t tlvs[3]; // 最多 3 个 TLV
+            LOG_I("widget_id=%d, event=%d, value=%d", msg.widget_id, msg.event, msg.value);
+
+            tlv_t tlvs[4];
             int tlv_count = 0;
 
-            switch (msg.widget_id)
+            // 在表中查找对应控件
+            for (int i = 0; i < RT_ARRAY_SIZE(widget_map); i++)
             {
-            case WIDGET_AIR_FRY_TEMP:
-                tlvs[tlv_count].type = TLV_MODE_TEMP;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = lv_slider_get_value(ui_Slider1);
-                tlv_count++;
-                break;
+                const widget_tlv_map_t *map = &widget_map[i];
+                if (msg.widget_id == map->widget_id)
+                {
+                    // 特殊处理 START：同时发送温度和时间
+                    if (msg.widget_id == WIDGET_AIR_FRY_START)
+                    {
+                        tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {get_slider1_value()}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_HEAT_TIME, 1, {get_slider2_value()}};
+                    }
+                    else
+                    {
+                        tlvs[tlv_count++] = (tlv_t){map->tlv_type, 1, {map->get_value ? map->get_value() : msg.value}};
+                    }
 
-            case WIDGET_AIR_FRY_TIMER:
-                tlvs[tlv_count].type = TLV_HEAT_TIME;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = lv_slider_get_value(ui_Slider2);
-                tlv_count++;
-                break;
-
-            case WIDGET_AIR_FRY_MODE:
-                tlvs[tlv_count].type = TLV_COOK_MODE;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = msg.value;
-                tlv_count++;
-                break;
-
-            case WIDGET_AIR_FRY_START:
-                // 可以根据需要选择同时发送温度和时间，也可以只发送开关
-                tlvs[tlv_count].type = TLV_MODE_TEMP;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = lv_slider_get_value(ui_Slider1);
-                tlv_count++;
-
-                tlvs[tlv_count].type = TLV_HEAT_TIME;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = lv_slider_get_value(ui_Slider2);
-                tlv_count++;
-                break;
-
-            default:
-                rt_kprintf("Other widget event\n");
-                return;
+                    // 延迟事件
+                    send_ui_event_delayed(map->delayed_event, map->delayed_time);
+                    break;
+                }
             }
 
-            // 通用开关 TLV
+            // 通用的开关 TLV
             if (msg.event == EVT_ON || msg.event == EVT_OFF)
             {
-                tlvs[tlv_count].type = TLV_SW;
-                tlvs[tlv_count].length = 1;
-                tlvs[tlv_count].value[0] = (msg.event == EVT_ON) ? 1 : 0;
-                tlv_count++;
+                tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {(msg.event == EVT_ON) ? 1 : 0}};
             }
 
+            // 统一发送 TLV
             if (tlv_count > 0)
                 send_tlv_settings(AIR_FRY_DEV_TYPE, tlvs, tlv_count);
-
-            if (msg.widget_id == WIDGET_AIR_FRY_TEMP)
-                send_ui_event_delayed(EVENT_UPDATA_SLIDER1_SCT, 1000);
-            else if (msg.widget_id == WIDGET_AIR_FRY_TIMER)
-                send_ui_event_delayed(EVENT_UPDATA_SLIDER2_SCT, 1000);
-            else if (msg.widget_id == WIDGET_AIR_FRY_START)
-                send_ui_event_delayed(EVENT_UPDATA_SW_SCT, 1500);
-            else if (msg.widget_id == WIDGET_AIR_FRY_MODE)
-                send_ui_event_delayed(EVENT_UPDATA_MODE_SCT, 1500);
         }
 
+        // 定时查询
         rt_thread_mdelay(TICK_MS);
         static uint32_t tick_count = 0;
         tick_count += TICK_MS;
@@ -129,6 +119,7 @@ void thread_deal_task_entry(void *parameter)
         }
     }
 }
+
 /* 静态定时器和参数 */
 static rt_timer_t ui_event_timer = RT_NULL;
 typedef struct
@@ -181,7 +172,7 @@ static void send_query_cmd(uint8_t dev_idx, tlv_t *tlvs, int tlv_count)
     int len = build_frame(&send_frame, FRAME_QUERY_REQ, dev_idx,
                           tlvs, tlv_count, buf);
     print_hex_buffer(TAG, buf, len);
-		UART_SendBytes(UART4, buf, len);
+    UART_SendBytes(UART4, buf, len);
     LOG_I(TAG, "writprint_hex_buffere to BLE");
 }
 
