@@ -70,7 +70,7 @@ void thread_deal_task_entry(void *parameter)
         {
             LOG_I("widget_id=%d, event=%d, value=%d", msg.widget_id, msg.event, msg.value);
 
-            tlv_t tlvs[4];
+            tlv_t tlvs[15];
             int tlv_count = 0;
 
             // 在表中查找对应控件
@@ -84,6 +84,32 @@ void thread_deal_task_entry(void *parameter)
                     {
                         tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {get_slider1_value()}};
                         tlvs[tlv_count++] = (tlv_t){TLV_HEAT_TIME, 1, {get_slider2_value()}};
+                    }
+                    else if (msg.widget_id == WIDGET_AIR_FRY_MODE)
+                    {
+                        // ==========================
+                        // 设置分区温度
+                        // ==========================
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TEMP, 1, {cooking_table[msg.value].area_temp[0]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE2_TEMP, 1, {cooking_table[msg.value].area_temp[1]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE3_TEMP, 1, {cooking_table[msg.value].area_temp[2]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE4_TEMP, 1, {cooking_table[msg.value].area_temp[3]}};
+
+                        // ==========================
+                        // 设置分区时间
+                        // ==========================
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TIME, 1, {cooking_table[msg.value].area_time[0]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE2_TIME, 1, {cooking_table[msg.value].area_time[1]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE3_TIME, 1, {cooking_table[msg.value].area_time[2]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE4_TIME, 1, {cooking_table[msg.value].area_time[3]}};
+
+                        // ==========================
+                        // 设置分区预约时间
+                        // ==========================
+                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE1_TIME, 1, {cooking_table[msg.value].area_countdown[0]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE2_TIME, 1, {cooking_table[msg.value].area_countdown[1]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE3_TIME, 1, {cooking_table[msg.value].area_countdown[2]}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE4_TIME, 1, {cooking_table[msg.value].area_countdown[3]}};
                     }
                     else
                     {
@@ -116,6 +142,11 @@ void thread_deal_task_entry(void *parameter)
             tick_count = 0;
             LOG_D("1s air fry query");
             do_1s_air_fry_query_cmd_generic();
+            // 检查闹钟
+            if (ds3231_check_alarm1())
+                rt_kprintf("Alarm1 triggered!\n");
+            else
+                rt_kprintf("Alarm1 not triggered.\n");
         }
     }
 }
@@ -166,24 +197,41 @@ void send_ui_event_delayed(rt_uint32_t event, rt_tick_t delay_ms)
 
 frame_t send_frame;
 #define TAG "TASK_DEAL"
+uint8_t send_buf[64];
+
 static void send_query_cmd(uint8_t dev_idx, tlv_t *tlvs, int tlv_count)
 {
-    uint8_t buf[32];
     int len = build_frame(&send_frame, FRAME_QUERY_REQ, dev_idx,
-                          tlvs, tlv_count, buf);
-    print_hex_buffer(TAG, buf, len);
-    UART_SendBytes(UART4, buf, len);
+                          tlvs, tlv_count, send_buf);
+    print_hex_buffer(TAG, send_buf, len);
+    UART_SendBytes(UART4, send_buf, len);
     LOG_I(TAG, "writprint_hex_buffere to BLE");
 }
 
-tlv_t ctl_tlvs[4]; // 用于查询的 TLV，最多 4 个 为3 会产生bug -- UNALIGNED
+tlv_t ctl_tlvs[8]; // 用于查询的 TLV，最多 4 个 为3 会产生bug -- UNALIGNED
 
 static int do_1s_air_fry_query_cmd_generic(void)
 {
-    ctl_tlvs[0].type = TLV_AREA1_TEMP;
-    ctl_tlvs[1].type = TLV_KPA;
-    ctl_tlvs[2].type = TLV_RH;
-    send_query_cmd(AIR_FRY_DEV_TYPE, ctl_tlvs, 3);
+    // 先清空数组，假设 ctl_tlvs 足够大
+    memset(ctl_tlvs, 0, sizeof(ctl_tlvs));
+
+    int tlv_count = 0;
+
+    // 查询分区温度
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_TEMP;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_TEMP;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_TEMP;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_TEMP;
+
+    // 查询分区剩余时间
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_REMAIN;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_REMAIN;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_REMAIN;
+    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_REMAIN;
+
+    // 发送查询命令
+    send_query_cmd(AIR_FRY_DEV_TYPE, ctl_tlvs, tlv_count);
+
     return 0;
 }
 
@@ -196,12 +244,12 @@ static void send_tlv_settings(uint8_t dev_id, tlv_t *tlvs, int tlv_count)
     }
     if (rt_sem_take(ble_sent_sem, RT_WAITING_FOREVER) == RT_EOK)
     {
-        uint8_t buf[32];
-        int len = build_frame(&send_frame, FRAME_CTRL_REQ, dev_id, tlvs, tlv_count, buf);
+
+        int len = build_frame(&send_frame, FRAME_CTRL_REQ, dev_id, tlvs, tlv_count, send_buf);
 
         LOG_I(TAG, "send data and  tlv_count = %d", tlv_count);
-        print_hex_buffer(TAG, buf, len);
-        UART_SendBytes(UART4, buf, len);
+        print_hex_buffer(TAG, send_buf, len);
+        UART_SendBytes(UART4, send_buf, len);
         rt_sem_release(ble_sent_sem);
         LOG_I(TAG, "write to BLE");
     }
@@ -233,7 +281,9 @@ void lv_ui_deal(uint16_t ms)
     rt_uint32_t e;
 
     if (rt_event_recv(&env.ui_event,
-                      EVENT_UPDATA_SLIDER1_SCT | EVENT_UPDATA_SLIDER2_SCT | EVENT_UPDATA_SW_SCT | EVENT_UPDATA_MODE_SCT,
+                      EVENT_UPDATA_SLIDER1_SCT | EVENT_UPDATA_SLIDER2_SCT |
+                          EVENT_UPDATA_SW_SCT | EVENT_UPDATA_MODE_SCT |
+                          EVENT_UPDATA_TIME,
                       RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                       RT_WAITING_NO, &e) == RT_EOK)
     {
@@ -252,6 +302,27 @@ void lv_ui_deal(uint16_t ms)
             rt_kprintf("[UI_EVENT] Recv: mode (0x%08x)\n", e);
             lv_refresh_area_percent(0, 0, 100, 25);
         }
+        if (e & EVENT_UPDATA_TIME)
+        {
+            char buf[16];
+            lv_obj_t *act_scr = lv_scr_act();
+            ds3231_get_time(&env.time);
+            rt_kprintf("[UI_EVENT] Recv: time (0x%08x) %02d:%02d:%02d\n", e, env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
+            // screen2
+            if (act_scr == ui_Screen2)
+            {
+                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_year);
+                lv_label_set_text(ui_yyLabel1, buf);
+                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_mon);
+                lv_label_set_text(ui_mmLabel1, buf);
+                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_mday);
+                lv_label_set_text(ui_ddLabel1, buf);
+                snprintf(buf, sizeof(buf), "%d:%d", env.alarm.tm_hour, env.alarm.tm_min);
+                lv_label_set_text(ui_minLabel1, buf);
+                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_sec);
+                lv_label_set_text(ui_ssLabel1, buf);
+            }
+        }
     }
     if (rt_mq_recv(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg), RT_WAITING_NO) == RT_EOK)
     {
@@ -260,11 +331,15 @@ void lv_ui_deal(uint16_t ms)
     }
     static uint32_t tick_last = 0;
     tick_last += ms;
-    if (tick_last >= 1000)
+    if (tick_last >= 500)
     {
         tick_last = 0;
-        lv_refresh_area_percent(0, 0, 100, 10);
-        lv_refresh_area_percent(0, 75, 100, 100);
+        extern lv_chart_series_t *ui_Chart3_series_1;
+        static uint8_t value1 = 0;
+        lv_chart_set_next_value(ui_Chart3, ui_Chart3_series_1, value1 += 5);
+        lv_chart_refresh(ui_Chart3); // 刷新图表以显示新数据
+        // lv_refresh_area_percent(0, 0, 100, 10);
+        // lv_refresh_area_percent(0, 75, 100, 100);
     }
     lv_timer_handler(); // LVGL渲染
 }
@@ -274,14 +349,42 @@ void ui_update_cb(void *param)
 
     if (msg->widget_id == WIDGET_AIR_FRY_DISPLAY)
     {
-        rt_kprintf("%0.1f %0.1f %0.1f", env.ctl_dev.kpa, env.ctl_dev.real_temp, env.ctl_dev.rh_value);
+        rt_kprintf("%0.1f %0.1f %0.1f", env.ctl_dev.kpa, env.ctl_dev.zone_real_temp[0], env.ctl_dev.rh_value);
         char buf[16];
-        snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.kpa);
-        lv_label_set_text(ui_paLabel, buf);
-        snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.real_temp);
-        lv_label_set_text(ui_humidityLabel, buf);
-        snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
-        lv_label_set_text(ui_tempLabel, buf);
+        // screen1
+        lv_obj_t *act_scr = lv_scr_act(); // 获取当前活动屏幕
+
+        if (act_scr == ui_Screen1)
+        {
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.kpa);
+            lv_label_set_text(ui_paLabel, buf);
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[0]);
+            lv_label_set_text(ui_humidityLabel, buf);
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
+            lv_label_set_text(ui_tempLabel, buf);
+        }
+        // screen3
+        if (act_scr == ui_Screen3)
+        {
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[0]);
+            lv_label_set_text(ui_area1tempLabel, buf);
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[1]);
+            lv_label_set_text(ui_area1tempLabel2, buf);
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[2]);
+            lv_label_set_text(ui_area1tempLabel3, buf);
+            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[3]);
+            lv_label_set_text(ui_area1tempLabel4, buf);
+
+            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[0]);
+            lv_label_set_text(ui_area1timeLabel1, buf);
+            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[1]);
+            lv_label_set_text(ui_area1timeLabel2, buf);
+            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[2]);
+            lv_label_set_text(ui_area1timeLabel3, buf);
+            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[3]);
+            lv_label_set_text(ui_area1timeLabel4, buf);
+        }
+
         lv_refresh_area_percent(0, 75, 50, 100); // 刷新1/4左下角
     }
 }

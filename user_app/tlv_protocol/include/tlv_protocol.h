@@ -55,19 +55,57 @@ extern "C"
         TYPE_COOKER_APPOINT_TIME = 0x76
     } cooker_type_t;
 
-    typedef enum
-    {
-        TLV_COOK_MODE = 0x80,    // 烹饪模式
-        TLV_HEAT_STATE = 0x81,   // 加热状态
-        TLV_HEAT_TIME = 0x82,    // 加热时间
-        TLV_RESERVE_TIME = 0x83, // 预约时间
-        TLV_MODE_TEMP = 0x84,    // 模式温度
-        TLV_MODE_POT = 0x85,
-        TLV_AREA1_TEMP = 0x86, // 区域1温度
-        TLV_KPA = 0x8D,        // 大气压
-        TLV_RH = 0x8E,         // 湿度
-        TLV_SW = 0x88,         // 开关
-    } air_fryer_type_t;
+		typedef enum
+		{
+				TLV_COOK_MODE    = 0x80, // 烹饪模式
+				TLV_HEAT_STATE   = 0x81, // 加热状态
+				TLV_HEAT_TIME    = 0x82, // 加热时间
+				TLV_RESERVE_TIME = 0x83, // 预约时间
+				TLV_MODE_TEMP    = 0x84, // 模式温度
+				TLV_MODE_POT     = 0x85, // 模式锅识别
+				TLV_AREA1_TEMP   = 0x86, // 区域1温度
+				TLV_SW           = 0x88, // 开关
+				TLV_KPA          = 0x8D, // 大气压
+				TLV_RH           = 0x8E, // 湿度
+
+				// =====================
+				// 新增：多分区温度 / 时间 / 预约 / 执行
+				// =====================
+				// --- 查询分区温度 (单位: 摄氏度) ---
+				TLV_QUERY_ZONE1_TEMP = 0x50, // 查询分区1温度 (uint16_t)
+				TLV_QUERY_ZONE2_TEMP = 0x51, // 查询分区2温度 (uint16_t)
+				TLV_QUERY_ZONE3_TEMP = 0x52, // 查询分区3温度 (uint16_t)
+				TLV_QUERY_ZONE4_TEMP = 0x53, // 查询分区4温度 (uint16_t)
+
+				// --- 查询分区剩余时间 (单位: 分钟) ---
+				TLV_QUERY_ZONE1_REMAIN = 0x54, // 查询分区1剩余时间 (uint16_t)
+				TLV_QUERY_ZONE2_REMAIN = 0x55, // 查询分区2剩余时间 (uint16_t)
+				TLV_QUERY_ZONE3_REMAIN = 0x56, // 查询分区3剩余时间 (uint16_t)
+				TLV_QUERY_ZONE4_REMAIN = 0x57, // 查询分区4剩余时间 (uint16_t)
+
+				// --- 设置分区温度 (单位: 摄氏度) ---
+				TLV_SET_ZONE1_TEMP = 0x58, // 设置分区1温度 (uint16_t)
+				TLV_SET_ZONE2_TEMP = 0x59, // 设置分区2温度 (uint16_t)
+				TLV_SET_ZONE3_TEMP = 0x5A, // 设置分区3温度 (uint16_t)
+				TLV_SET_ZONE4_TEMP = 0x5B, // 设置分区4温度 (uint16_t)
+
+				// --- 设置分区时间 (单位: 分钟) ---
+				TLV_SET_ZONE1_TIME = 0x5C, // 设置分区1时间 (uint16_t)
+				TLV_SET_ZONE2_TIME = 0x5D, // 设置分区2时间 (uint16_t)
+				TLV_SET_ZONE3_TIME = 0x5E, // 设置分区3时间 (uint16_t)
+				TLV_SET_ZONE4_TIME = 0x5F, // 设置分区4时间 (uint16_t)
+
+				// --- 分区预约时间 (单位: 分钟) ---
+				TLV_RESERVE_ZONE1_TIME = 0x60, // 分区1预约时间 (uint16_t)
+				TLV_RESERVE_ZONE2_TIME = 0x61, // 分区2预约时间 (uint16_t)
+				TLV_RESERVE_ZONE3_TIME = 0x62, // 分区3预约时间 (uint16_t)
+				TLV_RESERVE_ZONE4_TIME = 0x63, // 分区4预约时间 (uint16_t)
+
+				// --- 执行设置参数 ---
+				TLV_EXEC_PARAM = 0x64, // 执行设置参数 (uint8_t, 1=开始执行, 0=停止所有任务)
+				
+		} air_fryer_type_t;
+
     typedef enum
     {
         TLV_CURR_MODE = 0x90,        // 当前模式

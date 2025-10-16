@@ -8,7 +8,38 @@ extern "C"
 #include "platform.h"
 #include "rtthread.h"
 #include "tlv_protocol.h"
+#include "ds3231.h"
+  typedef enum
+  {
+    MODE_CHIPS = 0, // 薯条
+    MODE_CHICKEN,   // 鸡翅
+    MODE_FISH,      // 鱼
+    MODE_STEAK,     // 牛排
+    MODE_SHRIMP,    // 虾
+    MODE_BABYFOOD,  // 宝宝辅食
+    MODE_KEEPWARM,  // 保温
+    MODE_MAX
+  } recipes_t;
 
+// 对应食谱字符串数组（索引与枚举值一致）
+#define RECIPE_NAME_TABLE           \
+  {                                 \
+      [MODE_CHIPS] = "CHIPS",       \
+      [MODE_CHICKEN] = "CHICKEN",   \
+      [MODE_FISH] = "FISH",         \
+      [MODE_STEAK] = "STEAK",       \
+      [MODE_SHRIMP] = "SHRIMP",     \
+      [MODE_BABYFOOD] = "BABYFOOD", \
+      [MODE_KEEPWARM] = "KEEPWARM", \
+  }
+
+  typedef struct
+  {
+    recipes_t recipe;          // 菜谱类型
+    uint8_t area_temp[4];      // 温度（℃）
+    uint8_t area_time[4];      // 时间（分钟）
+    uint8_t area_countdown[4]; // 倒计时（分钟）
+  } cooking_data_t;
   typedef enum
   {
     // 电磁炉
@@ -65,11 +96,13 @@ extern "C"
   struct ctl_dev_t
   {
     uint8_t mode;
-    uint16_t set_temp;
-    uint16_t set_time;
+    uint16_t set_temp[4];
+    uint16_t set_time[4];
+    uint16_t coutdown_time[4];
     uint16_t start_flag;
     float kpa;
-    float real_temp;
+    float zone_real_temp[4];
+    uint16_t zone_remain_time[4];
     float rh_value;
   };
   struct base_dev_t
@@ -133,13 +166,19 @@ extern "C"
     struct rt_messagequeue msg_queue;
     struct rt_messagequeue bt_rev_msg_queue;
     struct rt_event ui_event;
+    struct tm alarm; 
+    struct tm time; 
   } env_t;
   extern env_t env;
+  extern const char *const recipe_name[];
+  extern const cooking_data_t cooking_table[];
 
 #define EVENT_UPDATA_SLIDER1_SCT (1 << 1)
 #define EVENT_UPDATA_SLIDER2_SCT (1 << 2)
 #define EVENT_UPDATA_SW_SCT (1 << 3)
 #define EVENT_UPDATA_MODE_SCT (1 << 4)
+#define EVENT_UPDATA_TIME (1 << 5)
+
 #ifdef __cplusplus
 }
 #endif

@@ -14,7 +14,7 @@ static struct bt_data msg_pool[MSG_QUEUE_CNT];
 
 #define QUEUE_CNT 8 // 最大消息数
 static display_msg_t dis_pool[QUEUE_CNT];
-
+#undef LOG_TAG
 #define LOG_TAG "BT_REV"
 #define LOG_LVL LOG_LVL_DBG
 #include <ulog.h>
@@ -40,7 +40,6 @@ static uint32_t tlv_get_u32_le(const tlv_t *tlv)
 	return val;
 }
 
-
 //=======================
 // TLV → 内存映射定义
 //=======================
@@ -51,24 +50,30 @@ typedef struct
 } tlv_map_t;
 
 //=== 控制响应 TLV 映射 ===
-static tlv_map_t ctrl_tlv_map[] =
+static tlv_map_t ctrl_resp_tlv_map[] =
 	{
-		{TLV_HEAT_TIME, &env.ctl_dev.set_temp},
-		{TLV_MODE_TEMP, &env.ctl_dev.set_temp},
+		{TLV_SET_ZONE1_TEMP, &env.ctl_dev.set_temp[0]},
+		{TLV_SET_ZONE2_TEMP, &env.ctl_dev.set_temp[1]},
+		{TLV_SET_ZONE3_TEMP, &env.ctl_dev.set_temp[2]},
+		{TLV_SET_ZONE4_TEMP, &env.ctl_dev.set_temp[3]},
+		{TLV_SET_ZONE1_TIME, &env.ctl_dev.set_time[0]},
+		{TLV_SET_ZONE2_TIME, &env.ctl_dev.set_time[1]},
+		{TLV_SET_ZONE3_TIME, &env.ctl_dev.set_time[2]},
+		{TLV_SET_ZONE4_TIME, &env.ctl_dev.set_time[3]},
 };
 
 //=== 查询响应 TLV 映射 ===
 // 代码更模块化、可维护性更强(方便增加/修改 TLV)
-static tlv_map_t query_tlv_map[] =
+static tlv_map_t query_resp_tlv_map[] =
 	{
-		{TLV_AREA1_TEMP, &env.ctl_dev.real_temp},
-		// {TLV_AREA2_TEMP, &env.ctl_dev.area_temp[1]},
-		// {TLV_AREA3_TEMP, &env.ctl_dev.area_temp[2]},
-		// {TLV_AREA4_TEMP, &env.ctl_dev.area_temp[3]},
-		// {TLV_AREA1_TIME, &env.ctl_dev.area_time[0]},
-		// {TLV_AREA2_TIME, &env.ctl_dev.area_time[1]},
-		// {TLV_AREA3_TIME, &env.ctl_dev.area_time[2]},
-		// {TLV_AREA4_TIME, &env.ctl_dev.area_time[3]},
+		{TLV_QUERY_ZONE1_TEMP, &env.ctl_dev.zone_real_temp[0]},
+		{TLV_QUERY_ZONE2_TEMP, &env.ctl_dev.zone_real_temp[1]},
+		{TLV_QUERY_ZONE3_TEMP, &env.ctl_dev.zone_real_temp[2]},
+		{TLV_QUERY_ZONE4_TEMP, &env.ctl_dev.zone_real_temp[3]},
+		{TLV_QUERY_ZONE1_REMAIN, &env.ctl_dev.zone_remain_time[0]},
+		{TLV_QUERY_ZONE2_REMAIN, &env.ctl_dev.zone_remain_time[1]},
+		{TLV_QUERY_ZONE3_REMAIN, &env.ctl_dev.zone_remain_time[2]},
+		{TLV_QUERY_ZONE4_REMAIN, &env.ctl_dev.zone_remain_time[3]},
 		{TLV_KPA, &env.ctl_dev.kpa},
 		{TLV_RH, &env.ctl_dev.rh_value},
 };
@@ -129,12 +134,12 @@ void thread_uart_task_entry(void *parameter)
 					switch (recv_frame.frame_type)
 					{
 					case FRAME_CTRL_RESP:
-						parse_tlv_by_map(&recv_frame, ctrl_tlv_map, RT_ARRAY_SIZE(ctrl_tlv_map));
+						parse_tlv_by_map(&recv_frame, ctrl_resp_tlv_map, RT_ARRAY_SIZE(ctrl_resp_tlv_map));
 						LOG_I("receive ctrl resp, set_temp=%d", env.ctl_dev.set_temp);
 						break;
 
 					case FRAME_QUERY_RESP:
-						parse_tlv_by_map(&recv_frame, query_tlv_map, RT_ARRAY_SIZE(query_tlv_map));
+						parse_tlv_by_map(&recv_frame, query_resp_tlv_map, RT_ARRAY_SIZE(query_resp_tlv_map));
 						dmsg.widget_id = WIDGET_AIR_FRY_DISPLAY;
 						rt_mq_send(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg));
 						break;
@@ -191,7 +196,7 @@ static void ui_updata(int argc, char **argv)
 {
 	display_msg_t dmsg;
 	dmsg.widget_id = WIDGET_AIR_FRY_DISPLAY;
-	env.ctl_dev.real_temp = 50.1f;
+	env.ctl_dev.zone_real_temp[0] = 50.1f;
 	env.ctl_dev.kpa = 50.2f;
 	env.ctl_dev.rh_value = 50.3f;
 

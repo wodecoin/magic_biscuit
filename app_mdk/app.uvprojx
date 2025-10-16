@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,CUSTOM_HSE_VAL, USE_APP,LVGL_RTTHREAD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\mm32f5270_nano_frame\base\library\CMSIS\Core\Include;..\mm32f5270_nano_frame\base\library\MM32F5270\HAL_Lib\Inc;..\mm32f5270_nano_frame\base\library\MM32F5270\Include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\libcpu\arm\cortex-m33;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\components\finsh;..\mm32f5270_nano_frame\base\plat;..\mm32f5270_nano_frame\base\core;..\mm32f5270_nano_frame\base\3rd_party\lvgl_rtthread;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\bsp\_template;..\user_app;..\user_app\ui\fonts;..\user_app\ui;..\user_app\ui\components;..\user_app\ui\screens;..\3rd_party\ulog;..\3rd_party\lvgl_rtthread;..\user_app\tlv_protocol\include</IncludePath>
+              <IncludePath>..\mm32f5270_nano_frame\base\library\CMSIS\Core\Include;..\mm32f5270_nano_frame\base\library\MM32F5270\HAL_Lib\Inc;..\mm32f5270_nano_frame\base\library\MM32F5270\Include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\include;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\libcpu\arm\cortex-m33;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\components\finsh;..\mm32f5270_nano_frame\base\plat;..\mm32f5270_nano_frame\base\core;..\mm32f5270_nano_frame\base\3rd_party\lvgl_rtthread;..\mm32f5270_nano_frame\base\rtthread-nano-4.1.1\rt-thread\bsp\_template;..\user_app;..\user_app\ui\fonts;..\user_app\ui;..\user_app\ui\components;..\user_app\ui\screens;..\3rd_party\ulog;..\3rd_party\lvgl_rtthread;..\user_app\tlv_protocol\include;..\mm32f5270_nano_frame\base\dev</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -434,6 +434,11 @@
               <FileType>1</FileType>
               <FilePath>..\mm32f5270_nano_frame\base\dev\amoled_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>ds3231.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mm32f5270_nano_frame\base\dev\ds3231.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -458,6 +463,21 @@
               <FileName>ui_helpers.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_app\ui\ui_helpers.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_Screen2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\screens\ui_Screen2.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_Screen3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\screens\ui_Screen3.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_Screen4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\screens\ui_Screen4.c</FilePath>
             </File>
           </Files>
         </Group>

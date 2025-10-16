@@ -4,7 +4,7 @@
 
 #include "tlv_protocol.h"
 
-#define MAX_FRAME_LEN 64
+#define MAX_FRAME_LEN 128
 #define LOG_TAG "BT_REV"
 #define LOG_LVL LOG_LVL_DBG
 #include <ulog.h>

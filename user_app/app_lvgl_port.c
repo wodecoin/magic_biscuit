@@ -3,11 +3,14 @@
 
 #include "amoled_touch.h"
 #define USE_LINE_MODE 1
-#define AMOLED_MAX_WIDTH 460
+#define AMOLED_MAX_WIDTH 470
 #define AMOLED_MAX_HEIGHT 460
+#undef LOG_TAG
 #define LOG_TAG "lvgl"
 #define LOG_LVL LOG_LVL_DBG
 #define AMOLED_FLUSH_ROWS 2
+#define OFFSET_X 5
+#define OFFSET_Y 5
 extern void amoled_write_block(uint16_t x, uint16_t y,
                                uint16_t width, uint16_t height,
                                const uint16_t *color, uint32_t buf_size);
@@ -17,8 +20,8 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
     if (!area || !color_p)
         return;
 
-    int32_t x1 = (area->x1 < 0) ? 0 : area->x1;
-    int32_t y1 = (area->y1 < 0) ? 0 : area->y1;
+    int32_t x1 = (area->x1 < 0) ? 0 : area->x1 ;
+    int32_t y1 = (area->y1 < 0) ? 0 : area->y1 ;
     int32_t x2 = (area->x2 >= AMOLED_MAX_WIDTH) ? (AMOLED_MAX_WIDTH - 1) : area->x2;
     int32_t y2 = (area->y2 >= AMOLED_MAX_HEIGHT) ? (AMOLED_MAX_HEIGHT - 1) : area->y2;
 
@@ -39,7 +42,7 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
 		if(height <= 4)// 全局刷新
 		{
 				amoled_write_block(
-						x1, y1,
+						x1+ OFFSET_X, y1+ OFFSET_Y,
 						width, height,
 						(uint16_t *)color_p,
 						height * width * 2);
@@ -53,7 +56,7 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
 
 //						LOG_I("Flush rows: x1=%d y=%d x2=%d (w=%d h=%d)", x1, y, x2, width, h);
 
-						amoled_write_block(x1, y, width, h, (uint16_t *)row_buffer, width * h * 2);
+						amoled_write_block(x1+ OFFSET_X, y+ OFFSET_Y, width, h, (uint16_t *)row_buffer, width * h * 2);
 				}
 		}
     rt_mutex_release(g_disp_mutex);

@@ -45,7 +45,7 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
     /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (24U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
@@ -522,7 +522,7 @@
     #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 #endif  /*LV_USE_CALENDAR*/
 
-#define LV_USE_CHART      0
+#define LV_USE_CHART      1
 
 #define LV_USE_COLORWHEEL 0
 
