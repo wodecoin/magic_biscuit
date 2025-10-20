@@ -37,6 +37,7 @@ lv_chart_series_t *ui_Chart1_series_3;
 lv_chart_series_t *ui_Chart1_series_4;
 lv_chart_series_t *ui_Chart2_series_1;
 lv_chart_series_t *ui_Chart3_series_1;
+
 void ui_Screen4_screen_init(void)
 {
     ui_Screen4 = lv_obj_create(NULL);
@@ -52,8 +53,8 @@ void ui_Screen4_screen_init(void)
     lv_chart_set_type(ui_Chart1, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_Chart1, 10);
     lv_chart_set_range(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 300);
-    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
 
     ui_Chart1_series_1 = lv_chart_add_series(ui_Chart1, lv_color_hex(0xBB7493), LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart1_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
@@ -89,8 +90,8 @@ void ui_Screen4_screen_init(void)
     lv_chart_set_type(ui_Chart2, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_Chart2, 10);
     lv_chart_set_range(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 0, 100); // 修复 Y 轴范围
-    lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
 
     ui_Chart2_series_1 = lv_chart_add_series(ui_Chart2, lv_color_hex(0xFF0000), LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart2_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
@@ -117,8 +118,8 @@ void ui_Screen4_screen_init(void)
     lv_chart_set_type(ui_Chart3, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_Chart3, 10);
     lv_chart_set_range(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 0, 200);
-    lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
+    // lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
 
     ui_Chart3_series_1 = lv_chart_add_series(ui_Chart3, lv_color_hex(0xFF0000), LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart3_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
@@ -134,7 +135,6 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_style_text_color(ui_Label60, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_Label60, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Label60, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     lv_obj_add_event_cb(ui_Screen4, ui_event_Screen4, LV_EVENT_ALL, NULL);
 }
 

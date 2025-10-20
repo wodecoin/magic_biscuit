@@ -274,7 +274,9 @@ void lv_refresh_area_percent(uint8_t x_start_percent, uint8_t y_start_percent,
     /* 标记该区域需要刷新 */
     lv_obj_invalidate_area(lv_scr_act(), &area);
 }
-
+static int x_start = 0; // x 轴起始值
+#define POINT_COUNT 10
+static lv_coord_t x_array[POINT_COUNT];
 void lv_ui_deal(uint16_t ms)
 {
 
@@ -337,6 +339,7 @@ void lv_ui_deal(uint16_t ms)
         extern lv_chart_series_t *ui_Chart3_series_1;
         static uint8_t value1 = 0;
         lv_chart_set_next_value(ui_Chart3, ui_Chart3_series_1, value1 += 5);
+
         lv_chart_refresh(ui_Chart3); // 刷新图表以显示新数据
         // lv_refresh_area_percent(0, 0, 100, 10);
         // lv_refresh_area_percent(0, 75, 100, 100);
