@@ -32,6 +32,19 @@ extern "C"
       [MODE_BABYFOOD] = "BABYFOOD", \
       [MODE_KEEPWARM] = "KEEPWARM", \
   }
+  typedef enum
+  {
+    MODE_STANDBY = 0, // 待机
+    MODE_HOT_POT,     // 火锅
+    MODE_INDUCTION_MAX
+  } induction_cooking_recipes_t;
+
+// 对应食谱字符串数组（索引与枚举值一致）
+#define INDUCTION_COOKING_NAME_TABLE \
+  {                                  \
+      [MODE_STANDBY] = "STANDBY",    \
+      [MODE_HOT_POT] = "HOT PORT",   \
+  }
 
   typedef struct
   {
@@ -40,15 +53,24 @@ extern "C"
     uint8_t area_time[4];      // 时间（分钟）
     uint8_t area_countdown[4]; // 倒计时（分钟）
   } cooking_data_t;
+
+  typedef struct
+  {
+    induction_cooking_recipes_t recipe; // 菜谱类型
+    uint8_t power;                      // 功率（w）
+    uint8_t time;                       // 运行时间（分钟）
+    uint8_t countdown;                  // 倒计时（分钟）
+  } induction_cooking_data_t;
   typedef enum
   {
     // 电磁炉
-    WIDGET_MODE,       // 模式滚轮
-    WIDGET_TEMP,       // 温度滚轮
-    WIDGET_PAN_DETECT, // 锅具检测开关
-    WIDGET_TIMER,      // 预约时间
-    WIDGET_WORK_TIME,  // 工作时间
-    WIDGET_SHUTDOWN,   // 关机时间
+    WIDGET_INDUCTION_COOKING_MODE, // 模式滚轮
+    WIDGET_TEMP,                   // 温度滚轮
+    WIDGET_PAN_DETECT,             // 锅具检测开关
+    WIDGET_TIMER,                  // 预约时间
+    WIDGET_WORK_TIME,              // 工作时间
+    WIDGET_SHUTDOWN,               // 关机时间
+    WIDGET_INDUCTION_COOKING_START,
 
     WIDGET_AIR_FRY_TIMER,
     WIDGET_AIR_FRY_TEMP,
@@ -63,10 +85,11 @@ extern "C"
   {
     // 电磁炉
     EVT_NONE = 0,
-    EVT_MODE_CHANGE,
-    EVT_TEMP_CHANGE,
-    EVT_ON,
-    EVT_OFF,
+    EVT_MODE_INDUCTION_COOKING_CHANGE,
+    EVT_TEMP_INDUCTION_COOKING_CHANGE,
+    EVT_INDUCTION_COOKING_ON,
+    EVT_INDUCTION_COOKING_OFF,
+
     EVT_PAN_DETECT_CHANGE,
     EVT_TIMER_CHANGE,
     EVT_WORK_TIME_CHANGE,
@@ -76,6 +99,8 @@ extern "C"
     EVT_AIR_FRY_TIMER_CHANGE,
     EVT_AIR_FRY_DISPLAY_CHANGE,
     EVT_AIR_FRY_MOED_CHANGE,
+    EVT_ON,
+    EVT_OFF,
     EVT_MUG_MODE_CHANGE
 
   } widget_event_t;
@@ -104,6 +129,14 @@ extern "C"
     float zone_real_temp[4];
     uint16_t zone_remain_time[4];
     float rh_value;
+  };
+  struct induction_cooking_ctl_dev_t
+  {
+    uint8_t mode;
+    uint16_t power;
+    uint16_t time;
+    uint16_t temperature;
+    uint8_t pot_detect;
   };
   struct base_dev_t
   {
@@ -161,13 +194,14 @@ extern "C"
   {
     struct base_dev_t base;
     struct ctl_dev_t ctl_dev;
+    struct induction_cooking_ctl_dev_t induction_cooking_ctl_dev;
     struct device_config_t dev_conf;
     struct rt_event btn_event; // 按键 事件控制块
     struct rt_messagequeue msg_queue;
     struct rt_messagequeue bt_rev_msg_queue;
     struct rt_event ui_event;
-    struct tm alarm; 
-    struct tm time; 
+    struct tm alarm;
+    struct tm time;
   } env_t;
   extern env_t env;
   extern const char *const recipe_name[];

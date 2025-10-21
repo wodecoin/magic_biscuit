@@ -12,6 +12,12 @@ lv_obj_t *ui_Chart2 = NULL;
 lv_obj_t *ui_Label59 = NULL;
 lv_obj_t *ui_Chart3 = NULL;
 lv_obj_t *ui_Label60 = NULL;
+lv_obj_t *ui_Container20 = NULL;
+lv_obj_t *ui_xaxisLabel6 = NULL;
+lv_obj_t *ui_xaxisLabel7 = NULL;
+lv_obj_t *ui_xaxisLabel8 = NULL;
+lv_obj_t *ui_xaxisLabel9 = NULL;
+lv_obj_t *ui_xaxisLabel10 = NULL;
 // event funtions
 void ui_event_Screen4(lv_event_t *e)
 {
@@ -41,37 +47,29 @@ lv_chart_series_t *ui_Chart3_series_1;
 void ui_Screen4_screen_init(void)
 {
     ui_Screen4 = lv_obj_create(NULL);
-    lv_obj_clear_flag(ui_Screen4, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui_Screen4, LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
-    // ui_Chart1（保持四条曲线）
     ui_Chart1 = lv_chart_create(ui_Screen4);
-    lv_obj_set_width(ui_Chart1, 381);
+    lv_obj_set_width(ui_Chart1, 402);
     lv_obj_set_height(ui_Chart1, 193);
-    lv_obj_set_x(ui_Chart1, 9);
-    lv_obj_set_y(ui_Chart1, -116);
+    lv_obj_set_x(ui_Chart1, 16);
+    lv_obj_set_y(ui_Chart1, -106);
     lv_obj_set_align(ui_Chart1, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_Chart1, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_Chart1, 10);
     lv_chart_set_range(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 300);
-    // lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    // lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
-
-    ui_Chart1_series_1 = lv_chart_add_series(ui_Chart1, lv_color_hex(0xBB7493), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_range(ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 0, 300);
+    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 0, 5, 0, 20, false, 25);
+    ui_Chart1_series_1 = lv_chart_add_series(ui_Chart1, lv_color_hex(0xBB7493),
+                                             LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart1_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
     lv_chart_set_ext_y_array(ui_Chart1, ui_Chart1_series_1, ui_Chart1_series_1_array);
-    ui_Chart1_series_2 = lv_chart_add_series(ui_Chart1, lv_color_hex(0x0081FF), LV_CHART_AXIS_PRIMARY_Y);
-    static lv_coord_t ui_Chart1_series_2_array[] = {0, 10, 20, 40, 80, 80, 40, 20, 10, 0};
-    lv_chart_set_ext_y_array(ui_Chart1, ui_Chart1_series_2, ui_Chart1_series_2_array);
-    ui_Chart1_series_3 = lv_chart_add_series(ui_Chart1, lv_color_hex(0x808080), LV_CHART_AXIS_PRIMARY_Y);
-    static lv_coord_t ui_Chart1_series_3_array[] = {0, 15, 50, 5, 50, 7, 40, 20, 10, 0};
-    lv_chart_set_ext_y_array(ui_Chart1, ui_Chart1_series_3, ui_Chart1_series_3_array);
-    ui_Chart1_series_4 = lv_chart_add_series(ui_Chart1, lv_color_hex(0xC12727), LV_CHART_AXIS_PRIMARY_Y);
-    static lv_coord_t ui_Chart1_series_4_array[] = {0, 2, 4, 8, 8, 40, 20, 10, 0};
-    lv_chart_set_ext_y_array(ui_Chart1, ui_Chart1_series_4, ui_Chart1_series_4_array);
 
     ui_Label57 = lv_label_create(ui_Chart1);
-    lv_obj_set_width(ui_Label57, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Label57, LV_SIZE_CONTENT);
+    lv_obj_set_width(ui_Label57, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_Label57, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_Label57, 165);
     lv_obj_set_y(ui_Label57, -73);
     lv_obj_set_align(ui_Label57, LV_ALIGN_CENTER);
@@ -80,26 +78,25 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_style_text_opa(ui_Label57, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Label57, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // ui_Chart2（只显示一条曲线）
     ui_Chart2 = lv_chart_create(ui_Screen4);
-    lv_obj_set_width(ui_Chart2, 183);
-    lv_obj_set_height(ui_Chart2, 156);
-    lv_obj_set_x(ui_Chart2, -101);
+    lv_obj_set_width(ui_Chart2, 190);
+    lv_obj_set_height(ui_Chart2, 150);
+    lv_obj_set_x(ui_Chart2, -90);
     lv_obj_set_y(ui_Chart2, 100);
     lv_obj_set_align(ui_Chart2, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_Chart2, LV_CHART_TYPE_LINE);
-    lv_chart_set_point_count(ui_Chart2, 10);
-    lv_chart_set_range(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 0, 100); // 修复 Y 轴范围
-    // lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    // lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
-
-    ui_Chart2_series_1 = lv_chart_add_series(ui_Chart2, lv_color_hex(0xFF0000), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_range(ui_Chart2, LV_CHART_AXIS_SECONDARY_Y, 0, 0);
+    lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_X, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_PRIMARY_Y, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart2, LV_CHART_AXIS_SECONDARY_Y, 0, 0, 0, 0, false, 30);
+    ui_Chart2_series_1 = lv_chart_add_series(ui_Chart2, lv_color_hex(0xBB7493),
+                                             LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart2_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
     lv_chart_set_ext_y_array(ui_Chart2, ui_Chart2_series_1, ui_Chart2_series_1_array);
 
     ui_Label59 = lv_label_create(ui_Chart2);
-    lv_obj_set_width(ui_Label59, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Label59, LV_SIZE_CONTENT);
+    lv_obj_set_width(ui_Label59, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_Label59, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_Label59, 74);
     lv_obj_set_y(ui_Label59, -62);
     lv_obj_set_align(ui_Label59, LV_ALIGN_CENTER);
@@ -108,26 +105,25 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_style_text_opa(ui_Label59, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Label59, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // ui_Chart3（只显示一条曲线）
     ui_Chart3 = lv_chart_create(ui_Screen4);
-    lv_obj_set_width(ui_Chart3, 183);
-    lv_obj_set_height(ui_Chart3, 152);
-    lv_obj_set_x(ui_Chart3, 128);
-    lv_obj_set_y(ui_Chart3, 101);
+    lv_obj_set_width(ui_Chart3, 190);
+    lv_obj_set_height(ui_Chart3, 150);
+    lv_obj_set_x(ui_Chart3, 130);
+    lv_obj_set_y(ui_Chart3, 100);
     lv_obj_set_align(ui_Chart3, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_Chart3, LV_CHART_TYPE_LINE);
-    lv_chart_set_point_count(ui_Chart3, 10);
     lv_chart_set_range(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 0, 200);
-    // lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
-    // lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
-
-    ui_Chart3_series_1 = lv_chart_add_series(ui_Chart3, lv_color_hex(0xFF0000), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_X, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_PRIMARY_Y, 10, 0, 5, 2, false, 50);
+    lv_chart_set_axis_tick(ui_Chart3, LV_CHART_AXIS_SECONDARY_Y, 0, 5, 0, 20, false, 25);
+    ui_Chart3_series_1 = lv_chart_add_series(ui_Chart3, lv_color_hex(0xBB7493),
+                                             LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart3_series_1_array[] = {0, 10, 20, 40, 80, 90, 100};
     lv_chart_set_ext_y_array(ui_Chart3, ui_Chart3_series_1, ui_Chart3_series_1_array);
 
     ui_Label60 = lv_label_create(ui_Chart3);
-    lv_obj_set_width(ui_Label60, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Label60, LV_SIZE_CONTENT);
+    lv_obj_set_width(ui_Label60, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_Label60, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_Label60, 55);
     lv_obj_set_y(ui_Label60, -60);
     lv_obj_set_align(ui_Label60, LV_ALIGN_CENTER);
@@ -135,6 +131,58 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_style_text_color(ui_Label60, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_Label60, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Label60, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Container20 = lv_obj_create(ui_Screen4);
+    lv_obj_remove_style_all(ui_Container20);
+    lv_obj_set_width(ui_Container20, 206);
+    lv_obj_set_height(ui_Container20, 13);
+    lv_obj_set_x(ui_Container20, 133);
+    lv_obj_set_y(ui_Container20, 193);
+    lv_obj_set_align(ui_Container20, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_Container20, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(ui_Container20, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_clear_flag(ui_Container20, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
+
+    ui_xaxisLabel6 = lv_label_create(ui_Container20);
+    lv_obj_set_width(ui_xaxisLabel6, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_xaxisLabel6, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_xaxisLabel6, 107);
+    lv_obj_set_y(ui_xaxisLabel6, 192);
+    lv_obj_set_align(ui_xaxisLabel6, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_xaxisLabel6, "1");
+
+    ui_xaxisLabel7 = lv_label_create(ui_Container20);
+    lv_obj_set_width(ui_xaxisLabel7, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_xaxisLabel7, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_xaxisLabel7, 107);
+    lv_obj_set_y(ui_xaxisLabel7, 192);
+    lv_obj_set_align(ui_xaxisLabel7, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_xaxisLabel7, "2");
+
+    ui_xaxisLabel8 = lv_label_create(ui_Container20);
+    lv_obj_set_width(ui_xaxisLabel8, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_xaxisLabel8, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_xaxisLabel8, 107);
+    lv_obj_set_y(ui_xaxisLabel8, 192);
+    lv_obj_set_align(ui_xaxisLabel8, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_xaxisLabel8, "3");
+
+    ui_xaxisLabel9 = lv_label_create(ui_Container20);
+    lv_obj_set_width(ui_xaxisLabel9, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_xaxisLabel9, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_xaxisLabel9, 107);
+    lv_obj_set_y(ui_xaxisLabel9, 192);
+    lv_obj_set_align(ui_xaxisLabel9, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_xaxisLabel9, "4");
+
+    ui_xaxisLabel10 = lv_label_create(ui_Container20);
+    lv_obj_set_width(ui_xaxisLabel10, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_xaxisLabel10, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_xaxisLabel10, 107);
+    lv_obj_set_y(ui_xaxisLabel10, 192);
+    lv_obj_set_align(ui_xaxisLabel10, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_xaxisLabel10, "5");
+
     lv_obj_add_event_cb(ui_Screen4, ui_event_Screen4, LV_EVENT_ALL, NULL);
 }
 
@@ -151,4 +199,10 @@ void ui_Screen4_screen_destroy(void)
     ui_Label59 = NULL;
     ui_Chart3 = NULL;
     ui_Label60 = NULL;
+    ui_Container20 = NULL;
+    ui_xaxisLabel6 = NULL;
+    ui_xaxisLabel7 = NULL;
+    ui_xaxisLabel8 = NULL;
+    ui_xaxisLabel9 = NULL;
+    ui_xaxisLabel10 = NULL;
 }

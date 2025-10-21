@@ -19,5 +19,6 @@
         "xmemory": "c",
         "ulog.h": "c"
     },
-    "cmake.ignoreCMakeListsMissing": true
+    "cmake.ignoreCMakeListsMissing": true,
+    "idf.portWin": "COM14"
 }

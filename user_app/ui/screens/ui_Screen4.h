@@ -21,6 +21,12 @@ extern lv_obj_t * ui_Chart2;
 extern lv_obj_t * ui_Label59;
 extern lv_obj_t * ui_Chart3;
 extern lv_obj_t * ui_Label60;
+extern lv_obj_t * ui_Container20;
+extern lv_obj_t * ui_xaxisLabel6;
+extern lv_obj_t * ui_xaxisLabel7;
+extern lv_obj_t * ui_xaxisLabel8;
+extern lv_obj_t * ui_xaxisLabel9;
+extern lv_obj_t * ui_xaxisLabel10;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

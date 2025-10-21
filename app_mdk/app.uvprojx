@@ -479,6 +479,11 @@
               <FileType>1</FileType>
               <FilePath>..\user_app\ui\screens\ui_Screen4.c</FilePath>
             </File>
+            <File>
+              <FileName>ui_Screen5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\ui\screens\ui_Screen5.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

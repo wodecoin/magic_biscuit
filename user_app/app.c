@@ -88,3 +88,23 @@ const cooking_data_t cooking_table[] =
 };
 
 const char *const recipe_name[] = RECIPE_NAME_TABLE;
+
+induction_cooking_data_t induction_cooking_table[] =
+    {
+        // 待机
+        {
+            .recipe = MODE_STANDBY,
+            .power = 0,
+            .time = 0,
+            .countdown = 0,
+        },
+        // 火锅
+        {
+            .recipe = MODE_HOT_POT,
+            .power = 180,
+            .time = 60,
+            .countdown = 0,
+        },
+};
+
+const char *const induction_cooking_recipe_name[] = INDUCTION_COOKING_NAME_TABLE;

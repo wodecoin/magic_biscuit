@@ -60,6 +60,7 @@ static tlv_map_t ctrl_resp_tlv_map[] =
 		{TLV_SET_ZONE2_TIME, &env.ctl_dev.set_time[1]},
 		{TLV_SET_ZONE3_TIME, &env.ctl_dev.set_time[2]},
 		{TLV_SET_ZONE4_TIME, &env.ctl_dev.set_time[3]},
+
 };
 
 //=== 查询响应 TLV 映射 ===
@@ -76,6 +77,10 @@ static tlv_map_t query_resp_tlv_map[] =
 		{TLV_QUERY_ZONE4_REMAIN, &env.ctl_dev.zone_remain_time[3]},
 		{TLV_KPA, &env.ctl_dev.kpa},
 		{TLV_RH, &env.ctl_dev.rh_value},
+
+		{TYPE_COOKER_POT_DETECT, &env.induction_cooking_ctl_dev.pot_detect},
+		{TLV_MODE_TEMP, &env.induction_cooking_ctl_dev.temperature},
+		{TYPE_COOKER_SET_POWER, &env.induction_cooking_ctl_dev.power}
 };
 
 //=======================

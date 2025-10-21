@@ -39,8 +39,8 @@ lv_obj_t *ui_Container4 = NULL;
 lv_obj_t *ui_Switch2 = NULL;
 lv_obj_t *ui_Label8 = NULL;
 
-ui_msg_t msg;
-
+static ui_msg_t msg;
+static recipes_t cur_recipe = 0;
 // event funtions
 void ui_event_Screen1(lv_event_t *e)
 {
@@ -58,7 +58,6 @@ void ui_event_Screen1(lv_event_t *e)
     }
 }
 
-static recipes_t cur_recipe = 0;
 void ui_event_ButtonChips(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -66,7 +65,8 @@ void ui_event_ButtonChips(lv_event_t *e)
     if (event_code == LV_EVENT_CLICKED)
     {
         _ui_label_set_property(ui_Label15, _UI_LABEL_PROPERTY_TEXT, recipe_name[cur_recipe++]);
-				if(cur_recipe == MODE_MAX)cur_recipe = MODE_CHIPS;
+        if (cur_recipe == MODE_MAX)
+            cur_recipe = MODE_CHIPS;
         msg.widget_id = WIDGET_AIR_FRY_MODE;
         msg.event = EVT_AIR_FRY_MOED_CHANGE;
         msg.value = cur_recipe;
@@ -210,7 +210,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_Label3, -4);
     lv_obj_set_y(ui_Label3, 0);
     lv_obj_set_align(ui_Label3, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label3, " Chips");
+    lv_label_set_text(ui_Label3, "Recipe");
     lv_obj_set_style_text_font(ui_Label3, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Container2 = lv_obj_create(ui_Screen1);

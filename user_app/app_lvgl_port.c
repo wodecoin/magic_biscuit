@@ -9,8 +9,8 @@
 #define LOG_TAG "lvgl"
 #define LOG_LVL LOG_LVL_DBG
 #define AMOLED_FLUSH_ROWS 2
-#define OFFSET_X 5
-#define OFFSET_Y 5
+#define OFFSET_X 0
+#define OFFSET_Y 0
 extern void amoled_write_block(uint16_t x, uint16_t y,
                                uint16_t width, uint16_t height,
                                const uint16_t *color, uint32_t buf_size);
@@ -20,18 +20,18 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
     if (!area || !color_p)
         return;
 
-    int32_t x1 = (area->x1 < 0) ? 0 : area->x1 ;
-    int32_t y1 = (area->y1 < 0) ? 0 : area->y1 ;
+    int32_t x1 = (area->x1 < 0) ? 0 : area->x1;
+    int32_t y1 = (area->y1 < 0) ? 0 : area->y1;
     int32_t x2 = (area->x2 >= AMOLED_MAX_WIDTH) ? (AMOLED_MAX_WIDTH - 1) : area->x2;
     int32_t y2 = (area->y2 >= AMOLED_MAX_HEIGHT) ? (AMOLED_MAX_HEIGHT - 1) : area->y2;
 
     uint16_t width = x2 - x1 + 1;
     uint16_t height = y2 - y1 + 1;
-		
-//		LOG_I("Flush area: x1=%d y1=%d x2=%d y2=%d (w=%d h=%d)",
-//					 area->x1, area->y1, area->x2, area->y2,
-//					 width, height);
-		
+
+    // LOG_I("Flush area: x1=%d y1=%d x2=%d y2=%d (w=%d h=%d)",
+    //       area->x1, area->y1, area->x2, area->y2,
+    //       width, height);
+
     if (width <= 0 || height <= 0)
     {
         LOG_E("Invalid area dimensions: width=%d, height=%d", width, height);
@@ -39,32 +39,49 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
     }
 
     rt_mutex_take(g_disp_mutex, RT_WAITING_FOREVER);
-		if(height <= 4)// 全局刷新
-		{
-				amoled_write_block(
-						x1+ OFFSET_X, y1+ OFFSET_Y,
-						width, height,
-						(uint16_t *)color_p,
-						height * width * 2);
-		}
-		else // 局部
-		{
-				for (int32_t y = y1; y <= y2; y += AMOLED_FLUSH_ROWS) {
-						uint16_t h = (y + AMOLED_FLUSH_ROWS - 1 <= y2) ? AMOLED_FLUSH_ROWS : (y2 - y + 1);
-						uint32_t offset = (y - area->y1) * (area->x2 - area->x1 + 1);
-						lv_color_t *row_buffer = color_p + offset;
+    if (height <= 4) // 全局刷新
+    {
+        amoled_write_block(
+            x1 + OFFSET_X, y1 + OFFSET_Y,
+            width, height,
+            (uint16_t *)color_p,
+            height * width * 2);
+    }
+    else // 局部
+    {
+        int32_t flush_rows = AMOLED_FLUSH_ROWS;
+        int32_t width = x2 - x1 + 1;
 
-//						LOG_I("Flush rows: x1=%d y=%d x2=%d (w=%d h=%d)", x1, y, x2, width, h);
+        for (int32_t y = y1; y <= y2;)
+        {
+            // 计算当前块高度
+            int32_t remain = y2 - y + 1;
+            uint16_t h = (remain >= flush_rows) ? flush_rows : remain;
 
-						amoled_write_block(x1+ OFFSET_X, y+ OFFSET_Y, width, h, (uint16_t *)row_buffer, width * h * 2);
-				}
-		}
+            // 计算当前行对应的显存偏移
+            uint32_t offset = (y - area->y1) * width;
+            lv_color_t *row_buffer = color_p + offset;
+
+            // LOG_I("Flush rows: x1=%d y=%d x2=%d (w=%d h=%d)", x1, y, x2, width, h);
+
+            // 调用屏幕写入函数
+            amoled_write_block(
+                x1 + OFFSET_X,
+                y + OFFSET_Y,
+                width,
+                h,
+                (uint16_t *)row_buffer,
+                width * h * 2);
+
+            y += h; // 按实际发送行数增加
+        }
+    }
     rt_mutex_release(g_disp_mutex);
 
-//    lv_disp_flush_ready(lv_disp_get_default()->driver);
+    //    lv_disp_flush_ready(lv_disp_get_default()->driver);
 }
 #define amoled_te_port GPIOB
-#define amoled_te_pin GPIO_Pin_2 // TE (可选)
+#define amoled_te_pin GPIO_Pin_13 // TE (可选)
 
 void te_wait_cb(lv_disp_drv_t *disp_drv)
 {
@@ -144,7 +161,7 @@ void amoled_touch_get_xy(lv_coord_t *x, lv_coord_t *y)
     uint8_t xy_buf[4] = {0};
 
     rt_mutex_take(g_disp_mutex, RT_WAITING_FOREVER);
-    i2c_read_bytes(&i2c1,  CST820_I2C_ADDR, CST820_REG_XPOS_H, xy_buf, 4);
+    i2c_read_bytes(&i2c1, CST820_I2C_ADDR, CST820_REG_XPOS_H, xy_buf, 4);
     rt_mutex_release(g_disp_mutex);
 
     uint8_t xh = xy_buf[0], xl = xy_buf[1];
@@ -191,7 +208,7 @@ int disp_touch_mutex_init(void)
             rt_kprintf("Failed to create g_disp_mutex\n");
         }
     }
-		return 0;
+    return 0;
 }
 
 INIT_APP_EXPORT(disp_touch_mutex_init);

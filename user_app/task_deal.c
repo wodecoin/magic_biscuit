@@ -39,6 +39,7 @@ static const widget_tlv_map_t widget_map[] = {
     {WIDGET_AIR_FRY_TIMER, TLV_HEAT_TIME, get_slider2_value, EVENT_UPDATA_SLIDER2_SCT, 1000},
     {WIDGET_AIR_FRY_MODE, TLV_COOK_MODE, NULL, EVENT_UPDATA_MODE_SCT, 1500},
     {WIDGET_AIR_FRY_START, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SW_SCT, 1500},
+    {WIDGET_INDUCTION_COOKING_MODE, TYPE_COOKER_MODE_SELECT, NULL, EVENT_UPDATA_MODE_SCT, 1500},
 };
 
 #define RT_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -111,21 +112,28 @@ void thread_deal_task_entry(void *parameter)
                         tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE3_TIME, 1, {cooking_table[msg.value].area_countdown[2]}};
                         tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE4_TIME, 1, {cooking_table[msg.value].area_countdown[3]}};
                     }
-                    else
+                    else if (msg.widget_id == WIDGET_INDUCTION_COOKING_MODE)
                     {
-                        tlvs[tlv_count++] = (tlv_t){map->tlv_type, 1, {map->get_value ? map->get_value() : msg.value}};
+                        tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {msg.value}};
                     }
+                    // else
+                    // {
+                    //     tlvs[tlv_count++] = (tlv_t){map->tlv_type, 1, {map->get_value ? map->get_value() : msg.value}};
+                    // }
 
                     // 延迟事件
                     send_ui_event_delayed(map->delayed_event, map->delayed_time);
                     break;
                 }
             }
-
-            // 通用的开关 TLV
+            // 开始/停止特殊处理
             if (msg.event == EVT_ON || msg.event == EVT_OFF)
             {
                 tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {(msg.event == EVT_ON) ? 1 : 0}};
+            }
+            else if (msg.event == EVT_INDUCTION_COOKING_ON || msg.event == EVT_INDUCTION_COOKING_OFF)
+            {
+                tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_OFF_TIMER, 1, {(msg.event == EVT_INDUCTION_COOKING_ON) ? 1 : 0}};
             }
 
             // 统一发送 TLV
@@ -212,23 +220,32 @@ tlv_t ctl_tlvs[8]; // 用于查询的 TLV，最多 4 个 为3 会产生bug -- UN
 
 static int do_1s_air_fry_query_cmd_generic(void)
 {
+
     // 先清空数组，假设 ctl_tlvs 足够大
     memset(ctl_tlvs, 0, sizeof(ctl_tlvs));
 
     int tlv_count = 0;
+    lv_obj_t *act_scr = lv_scr_act();
+    if (act_scr == ui_Screen5)
+    {
+        ctl_tlvs[tlv_count++].type = TYPE_COOKER_POT_DETECT;
+        ctl_tlvs[tlv_count++].type = TLV_MODE_TEMP;
+        ctl_tlvs[tlv_count++].type = TYPE_COOKER_SET_POWER;
+    }
+    else if (act_scr == ui_Screen1)
+    {
+        // 查询分区温度
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_TEMP;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_TEMP;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_TEMP;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_TEMP;
 
-    // 查询分区温度
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_TEMP;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_TEMP;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_TEMP;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_TEMP;
-
-    // 查询分区剩余时间
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_REMAIN;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_REMAIN;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_REMAIN;
-    ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_REMAIN;
-
+        // 查询分区剩余时间
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_REMAIN;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_REMAIN;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_REMAIN;
+        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_REMAIN;
+    }
     // 发送查询命令
     send_query_cmd(AIR_FRY_DEV_TYPE, ctl_tlvs, tlv_count);
 
@@ -365,6 +382,16 @@ void ui_update_cb(void *param)
             lv_label_set_text(ui_humidityLabel, buf);
             snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
             lv_label_set_text(ui_tempLabel, buf);
+        }
+
+        if (act_scr == ui_Screen5)
+        {
+            // snprintf(buf, sizeof(buf), "%.2f", (float)(env.induction_cooking_ctl_dev.temperature / 100));
+            // lv_label_set_text(ui_paLabel, buf);
+            // snprintf(buf, sizeof(buf), "%d", env.induction_cooking_ctl_dev.pot_detect);
+            // lv_label_set_text(ui_humidityLabel, buf);
+            // snprintf(buf, sizeof(buf), "%.1f", env.induction_cooking_ctl_dev.power);
+            // lv_label_set_text(ui_tempLabel, buf);
         }
         // screen3
         if (act_scr == ui_Screen3)
