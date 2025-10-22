@@ -53,6 +53,7 @@ extern "C"
         TYPE_COOKER_POT_DETECT = 0x74,
         TYPE_COOKER_OFF_TIMER = 0x75,
         TYPE_COOKER_APPOINT_TIME = 0x76,
+        TYPE_COOKER_START = 0x77,
     } cooker_type_t;
 
     typedef enum

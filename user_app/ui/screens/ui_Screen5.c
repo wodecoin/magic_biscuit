@@ -45,6 +45,7 @@ void ui_event_Button1(lv_event_t *e)
         msg.event = EVT_AIR_FRY_MOED_CHANGE;
         msg.value = cur_recipe;
         rt_mq_send(&env.msg_queue, &msg, sizeof(msg));
+        rt_event_send(&env.ui_event, EVENT_MOTOR_WORK);
     }
 }
 
@@ -57,13 +58,23 @@ void ui_event_Switch1(lv_event_t *e)
     {
         _ui_checked_set_text_value(ui_Label39, target, "ON", "OFF");
         msg.widget_id = WIDGET_INDUCTION_COOKING_START;
-        msg.value = 0;
+
         rt_mq_send(&env.msg_queue, &msg, sizeof(msg));
         if (lv_obj_has_state(target, LV_STATE_CHECKED))
+        {
             msg.event = EVT_INDUCTION_COOKING_ON;
+            msg.value = 1;
+        }
+
         else
+        {
             msg.event = EVT_INDUCTION_COOKING_OFF;
+            msg.value = 2;
+        }
+
         rt_mq_send(&env.msg_queue, &msg, sizeof(msg));
+
+        rt_event_send(&env.ui_event, EVENT_MOTOR_WORK);
     }
 }
 
@@ -228,8 +239,8 @@ void ui_Screen5_screen_init(void)
     lv_obj_set_style_text_font(ui_CookModeNameLabelPower, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Switch1 = lv_switch_create(ui_Screen5);
-    lv_obj_set_width(ui_Switch1, 149);
-    lv_obj_set_height(ui_Switch1, 59);
+    lv_obj_set_width(ui_Switch1, 120);
+    lv_obj_set_height(ui_Switch1, 60);
     lv_obj_set_x(ui_Switch1, -14);
     lv_obj_set_y(ui_Switch1, 161);
     lv_obj_set_align(ui_Switch1, LV_ALIGN_CENTER);

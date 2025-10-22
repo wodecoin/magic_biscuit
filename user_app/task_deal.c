@@ -1,5 +1,6 @@
 #include "app.h"
 #include "ui.h"
+#include "algorithm.h"
 #undef LOG_TAG
 #define LOG_TAG "DEAL_TASK"
 #define LOG_LVL LOG_LVL_DBG
@@ -40,10 +41,12 @@ static const widget_tlv_map_t widget_map[] = {
     {WIDGET_AIR_FRY_MODE, TLV_COOK_MODE, NULL, EVENT_UPDATA_MODE_SCT, 1500},
     {WIDGET_AIR_FRY_START, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SW_SCT, 1500},
     {WIDGET_INDUCTION_COOKING_MODE, TYPE_COOKER_MODE_SELECT, NULL, EVENT_UPDATA_MODE_SCT, 1500},
+		{WIDGET_INDUCTION_COOKING_START, TYPE_COOKER_START, NULL, EVENT_UPDATA_MODE_SCT, 1500},
 };
 
 #define RT_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-
+sliding_filter_t bus_adc_filter;
+sliding_filter_t bat_adc_filter;
 void thread_deal_task_entry(void *parameter)
 {
     ui_msg_t msg;
@@ -62,7 +65,10 @@ void thread_deal_task_entry(void *parameter)
     ble_sent_sem = rt_sem_create("blesem", 1, RT_IPC_FLAG_PRIO);
     if (ble_sent_sem == RT_NULL)
         rt_kprintf("create sem failed\n");
-
+    adc_config_single(ADC2);
+    sliding_filter_init(&bus_adc_filter);
+    sliding_filter_init(&bat_adc_filter);
+    rt_uint32_t e;
     while (1)
     {
         result = rt_mq_recv(&env.msg_queue, &msg, sizeof(msg), RT_WAITING_NO);
@@ -114,7 +120,13 @@ void thread_deal_task_entry(void *parameter)
                     }
                     else if (msg.widget_id == WIDGET_INDUCTION_COOKING_MODE)
                     {
-                        tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {msg.value}};
+                        // tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {msg.value}};
+                        env.induction_cooking_ctl_dev.mode = msg.value;
+                    }
+                    else if (msg.widget_id == WIDGET_INDUCTION_COOKING_START)
+                    {
+                        tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {env.induction_cooking_ctl_dev.mode}};
+                        // tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_START, 1, {msg.value}};
                     }
                     // else
                     // {
@@ -133,7 +145,8 @@ void thread_deal_task_entry(void *parameter)
             }
             else if (msg.event == EVT_INDUCTION_COOKING_ON || msg.event == EVT_INDUCTION_COOKING_OFF)
             {
-                tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_OFF_TIMER, 1, {(msg.event == EVT_INDUCTION_COOKING_ON) ? 1 : 0}};
+                LOG_D("INDUCTION_COOKING_ON/OFF event");
+                tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_START, 1, {(msg.event == EVT_INDUCTION_COOKING_ON) ? 1 : 0}};
             }
 
             // 统一发送 TLV
@@ -145,20 +158,40 @@ void thread_deal_task_entry(void *parameter)
         rt_thread_mdelay(TICK_MS);
         static uint32_t tick_count = 0;
         tick_count += TICK_MS;
-        if (tick_count >= 1500)
+        if (tick_count >= 3000)
         {
             tick_count = 0;
             LOG_D("1s air fry query");
             do_1s_air_fry_query_cmd_generic();
             // 检查闹钟
             if (ds3231_check_alarm1())
-                rt_kprintf("Alarm1 triggered!\n");
+                LOG_I("Alarm1 triggered!\n");
             else
-                rt_kprintf("Alarm1 not triggered.\n");
+                LOG_D("Alarm1 not triggered.\n");
+            // 查询adc
+            float adc_value;
+            adc_value = sliding_filter_process(&bus_adc_filter, adc_volt_read_single(ADC2, BUS_ADC_CH, 36, 10));
+            rt_kprintf("bus volt = %f \n", adc_value);
+            adc_value = sliding_filter_process(&bat_adc_filter, adc_volt_read_single(ADC2, BAT_ADC_CH, 200, 200));
+            rt_kprintf("bat volt = %f \n", adc_value);
+        }
+
+        if (rt_event_recv(&env.ui_event,
+                          EVENT_MOTOR_WORK,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_NO, &e) == RT_EOK)
+        {
+            if (e & EVENT_MOTOR_WORK)
+            {
+                LOG_D("[UI_EVENT] Recv: EVENT_MOTOR_WORK (0x%08x)\n", e);
+                // 使能震动电机
+                GPIO_SetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
+                rt_thread_mdelay(50);
+                GPIO_ResetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
+            }
         }
     }
 }
-
 /* 静态定时器和参数 */
 static rt_timer_t ui_event_timer = RT_NULL;
 typedef struct
@@ -386,12 +419,12 @@ void ui_update_cb(void *param)
 
         if (act_scr == ui_Screen5)
         {
-            // snprintf(buf, sizeof(buf), "%.2f", (float)(env.induction_cooking_ctl_dev.temperature / 100));
-            // lv_label_set_text(ui_paLabel, buf);
-            // snprintf(buf, sizeof(buf), "%d", env.induction_cooking_ctl_dev.pot_detect);
-            // lv_label_set_text(ui_humidityLabel, buf);
-            // snprintf(buf, sizeof(buf), "%.1f", env.induction_cooking_ctl_dev.power);
-            // lv_label_set_text(ui_tempLabel, buf);
+            snprintf(buf, sizeof(buf), "%.2f", (float)(env.induction_cooking_ctl_dev.temperature / 100));
+            lv_label_set_text(ui_CookerDisplayTempLabel, buf);
+            snprintf(buf, sizeof(buf), "%d", env.induction_cooking_ctl_dev.pot_detect);
+            lv_label_set_text(ui_PotLabel, buf);
+            snprintf(buf, sizeof(buf), "%d", env.induction_cooking_ctl_dev.power);
+            lv_label_set_text(ui_CookerDisplayPowerLabel, buf);
         }
         // screen3
         if (act_scr == ui_Screen3)

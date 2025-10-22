@@ -108,3 +108,30 @@ induction_cooking_data_t induction_cooking_table[] =
 };
 
 const char *const induction_cooking_recipe_name[] = INDUCTION_COOKING_NAME_TABLE;
+
+int pmu_init(void)
+{
+    gpio_config(PMU_CD_PORT, PMU_CD_PIN, GPIO_Mode_Out_PP, GPIO_Speed_High);
+    GPIO_ResetBits(PMU_CD_PORT, PMU_CD_PIN);
+    gpio_config(PMU_EN_PORT, PMU_EN_PIN, GPIO_Mode_Out_PP, GPIO_Speed_High);
+    GPIO_SetBits(PMU_EN_PORT, PMU_EN_PIN); // 使能 PMU
+    return 0;
+}
+INIT_DEVICE_EXPORT(pmu_init);
+
+int shake_motor_init(void)
+{
+    gpio_config(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN, GPIO_Mode_Out_PP, GPIO_Speed_High);
+    GPIO_ResetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
+    return 0;
+}
+INIT_DEVICE_EXPORT(shake_motor_init);
+
+/* --- 读取闹钟设置 --- */
+void motor_work_cmd(void)
+{
+    GPIO_SetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
+    rt_thread_mdelay(500);
+    GPIO_ResetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
+}
+MSH_CMD_EXPORT(motor_work_cmd, get DS3231 alarm1 time);

@@ -60,6 +60,7 @@ static tlv_map_t ctrl_resp_tlv_map[] =
 		{TLV_SET_ZONE2_TIME, &env.ctl_dev.set_time[1]},
 		{TLV_SET_ZONE3_TIME, &env.ctl_dev.set_time[2]},
 		{TLV_SET_ZONE4_TIME, &env.ctl_dev.set_time[3]},
+		{TYPE_COOKER_MODE_SELECT, &env.induction_cooking_ctl_dev.mode},
 
 };
 
@@ -80,8 +81,7 @@ static tlv_map_t query_resp_tlv_map[] =
 
 		{TYPE_COOKER_POT_DETECT, &env.induction_cooking_ctl_dev.pot_detect},
 		{TLV_MODE_TEMP, &env.induction_cooking_ctl_dev.temperature},
-		{TYPE_COOKER_SET_POWER, &env.induction_cooking_ctl_dev.power}
-};
+		{TYPE_COOKER_SET_POWER, &env.induction_cooking_ctl_dev.power}};
 
 //=======================
 // 通用 TLV 解析函数 by 表映射

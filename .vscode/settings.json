@@ -17,7 +17,10 @@
         "cstddef": "c",
         "limits": "c",
         "xmemory": "c",
-        "ulog.h": "c"
+        "ulog.h": "c",
+        "algorithm.h": "c",
+        "tuple": "c",
+        "utility": "c"
     },
     "cmake.ignoreCMakeListsMissing": true,
     "idf.portWin": "COM14"
