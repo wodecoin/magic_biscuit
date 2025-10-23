@@ -38,6 +38,7 @@ extern "C"
     extern lv_obj_t *ui_Switch1;
     extern lv_obj_t *ui_Label39;
     extern lv_obj_t *ui_TimeLabel;
+    extern lv_obj_t *ui_VoltLabel;
     // CUSTOM VARIABLES
 
 #ifdef __cplusplus

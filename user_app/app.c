@@ -26,7 +26,7 @@ void app(void)
     rt_thread_mdelay(2000);
     Q_CREATE_THREAD(deal, 1024 * 2, 26, 5);
     Q_CREATE_THREAD(uart, 1024, 26, 5);
-
+    Q_CREATE_THREAD(audio, 1024, 26, 5);
     for (;;)
     {
         rt_thread_mdelay(100);

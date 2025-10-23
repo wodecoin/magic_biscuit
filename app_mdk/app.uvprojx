@@ -429,6 +429,11 @@
               <FileType>1</FileType>
               <FilePath>..\user_app\algorithm\algorithm.c</FilePath>
             </File>
+            <File>
+              <FileName>task_audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user_app\task_audio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -443,6 +448,11 @@
               <FileName>ds3231.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mm32f5270_nano_frame\base\dev\ds3231.c</FilePath>
+            </File>
+            <File>
+              <FileName>onewire_bus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mm32f5270_nano_frame\base\dev\onewire_bus.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,6 +1,7 @@
 #include "app.h"
 #include "ui.h"
 #include "algorithm.h"
+
 #undef LOG_TAG
 #define LOG_TAG "DEAL_TASK"
 #define LOG_LVL LOG_LVL_DBG
@@ -11,6 +12,7 @@
 static char msg_pool[MSG_POOL_SIZE]; // 注意这里是字节数组
 
 #define AIR_FRY_DEV_TYPE 0x03
+#define COOKING_DEV_TYPE 0x02
 #define TICK_MS 50
 
 static rt_sem_t ble_sent_sem = RT_NULL;
@@ -151,7 +153,7 @@ void thread_deal_task_entry(void *parameter)
 
             // 统一发送 TLV
             if (tlv_count > 0)
-                send_tlv_settings(AIR_FRY_DEV_TYPE, tlvs, tlv_count);
+                send_tlv_settings(COOKING_DEV_TYPE, tlvs, tlv_count);
         }
 
         // 定时查询
@@ -169,31 +171,16 @@ void thread_deal_task_entry(void *parameter)
             else
                 LOG_D("Alarm1 not triggered.\n");
             // 查询adc
-            float adc_value;
-            adc_value = sliding_filter_process(&bus_adc_filter, adc_volt_read_single(ADC2, BUS_ADC_CH, 36, 10));
-            rt_kprintf("bus volt = %f \n", adc_value);
-            adc_value = sliding_filter_process(&bat_adc_filter, adc_volt_read_single(ADC2, BAT_ADC_CH, 200, 200));
-            rt_kprintf("bat volt = %f \n", adc_value);
+
+            env.base.charge_volt = sliding_filter_process(&bus_adc_filter, adc_volt_read_single(ADC2, BUS_ADC_CH, 36, 10));
+            rt_kprintf("bus volt = %f \n", env.base.charge_volt);
+            env.base.bat_volt = sliding_filter_process(&bat_adc_filter, adc_volt_read_single(ADC2, BAT_ADC_CH, 200, 200));
+            rt_kprintf("bat volt = %f \n", env.base.bat_volt);
         }
         if (tick_count % 1000 == 0)
         {
             rt_event_send(&env.ui_event, EVENT_UPDATA_REAL_TIME);
             ds3231_get_time(&env.time);
-        }
-
-        if (rt_event_recv(&env.ui_event,
-                          EVENT_MOTOR_WORK,
-                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
-                          RT_WAITING_NO, &e) == RT_EOK)
-        {
-            if (e & EVENT_MOTOR_WORK)
-            {
-                LOG_D("[UI_EVENT] Recv: EVENT_MOTOR_WORK (0x%08x)\n", e);
-                // 使能震动电机
-                GPIO_SetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
-                rt_thread_mdelay(50);
-                GPIO_ResetBits(SHAKE_MOTOR_PORT, SHAKE_MOTOR_PIN);
-            }
         }
     }
 }
@@ -267,8 +254,8 @@ static int do_1s_air_fry_query_cmd_generic(void)
     if (act_scr == ui_Screen5)
     {
         ctl_tlvs[tlv_count++].type = TYPE_COOKER_POT_DETECT;
-        ctl_tlvs[tlv_count++].type = TLV_MODE_TEMP;
-        ctl_tlvs[tlv_count++].type = TYPE_COOKER_SET_POWER;
+        ctl_tlvs[tlv_count++].type = TLV_TEMP;
+        ctl_tlvs[tlv_count++].type = TLV_POWER;
     }
     else if (act_scr == ui_Screen1)
     {
@@ -285,7 +272,7 @@ static int do_1s_air_fry_query_cmd_generic(void)
         ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_REMAIN;
     }
     // 发送查询命令
-    send_query_cmd(AIR_FRY_DEV_TYPE, ctl_tlvs, tlv_count);
+    send_query_cmd(COOKING_DEV_TYPE, ctl_tlvs, tlv_count);
 
     return 0;
 }
@@ -384,7 +371,9 @@ void lv_ui_deal(uint16_t ms)
         {
             snprintf(buf, sizeof(buf), "%d:%d:%d", env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
             lv_label_set_text(ui_TimeLabel, buf);
-            lv_refresh_area_percent(0, 25, 100, 100);
+            snprintf(buf, sizeof(buf), "%0.1f| %0.2fV", env.base.charge_volt, env.base.bat_volt);
+            lv_label_set_text(ui_VoltLabel, buf);
+            lv_refresh_area_percent(15, 25, 100, 100);
         }
     }
     if (rt_mq_recv(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg), RT_WAITING_NO) == RT_EOK)

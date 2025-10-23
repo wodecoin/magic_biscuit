@@ -27,6 +27,7 @@ lv_obj_t *ui_CookModeNameLabelPower = NULL;
 lv_obj_t *ui_Switch1 = NULL;
 lv_obj_t *ui_Label39 = NULL;
 lv_obj_t *ui_TimeLabel = NULL;
+lv_obj_t *ui_VoltLabel = NULL;
 static ui_msg_t msg;
 
 // event funtions
@@ -45,7 +46,7 @@ void ui_event_Button1(lv_event_t *e)
         msg.event = EVT_AIR_FRY_MOED_CHANGE;
         msg.value = cur_recipe;
         rt_mq_send(&env.msg_queue, &msg, sizeof(msg));
-        rt_event_send(&env.ui_event, EVENT_MOTOR_WORK);
+        rt_event_send(&env.ui_event, EVENT_MOTOR_WORK | EVENT_PLAY_AUDIO);
     }
 }
 
@@ -240,7 +241,7 @@ void ui_Screen5_screen_init(void)
 
     ui_Switch1 = lv_switch_create(ui_Screen5);
     lv_obj_set_width(ui_Switch1, 120);
-    lv_obj_set_height(ui_Switch1, 60);
+    lv_obj_set_height(ui_Switch1, 55);
     lv_obj_set_x(ui_Switch1, -14);
     lv_obj_set_y(ui_Switch1, 161);
     lv_obj_set_align(ui_Switch1, LV_ALIGN_CENTER);
@@ -262,6 +263,15 @@ void ui_Screen5_screen_init(void)
     lv_obj_set_align(ui_TimeLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_TimeLabel, "10:30:00");
     lv_obj_set_style_text_font(ui_TimeLabel, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_VoltLabel = lv_label_create(ui_Screen5);
+    lv_obj_set_width(ui_VoltLabel, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_VoltLabel, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_VoltLabel, 143);
+    lv_obj_set_y(ui_VoltLabel, -97);
+    lv_obj_set_align(ui_VoltLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_VoltLabel, "4.5 | 3.7V");
+    lv_obj_set_style_text_font(ui_VoltLabel, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Switch1, ui_event_Switch1, LV_EVENT_ALL, NULL);
@@ -295,4 +305,5 @@ void ui_Screen5_screen_destroy(void)
     ui_Switch1 = NULL;
     ui_Label39 = NULL;
     ui_TimeLabel = NULL;
+    ui_VoltLabel = NULL;
 }

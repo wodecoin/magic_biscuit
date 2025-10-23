@@ -145,6 +145,8 @@ extern "C"
     uint16_t hardware_version;
     uint16_t uuid;
     uint8_t error_code;
+    float charge_volt;
+    float bat_volt;
   };
 
   struct device_config_t
@@ -214,6 +216,7 @@ extern "C"
 #define EVENT_UPDATA_TIME (1 << 5)
 #define EVENT_MOTOR_WORK (1 << 6)
 #define EVENT_UPDATA_REAL_TIME (1 << 7)
+#define EVENT_PLAY_AUDIO (1 << 8)
 
 #ifdef __cplusplus
 }
