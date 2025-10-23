@@ -26,7 +26,7 @@ lv_obj_t *ui_Panel14 = NULL;
 lv_obj_t *ui_CookModeNameLabelPower = NULL;
 lv_obj_t *ui_Switch1 = NULL;
 lv_obj_t *ui_Label39 = NULL;
-
+lv_obj_t *ui_TimeLabel = NULL;
 static ui_msg_t msg;
 
 // event funtions
@@ -254,6 +254,15 @@ void ui_Screen5_screen_init(void)
     lv_label_set_text(ui_Label39, "OFF");
     lv_obj_set_style_text_font(ui_Label39, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_TimeLabel = lv_label_create(ui_Screen5);
+    lv_obj_set_width(ui_TimeLabel, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_TimeLabel, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_TimeLabel, -10);
+    lv_obj_set_y(ui_TimeLabel, -97);
+    lv_obj_set_align(ui_TimeLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_TimeLabel, "10:30:00");
+    lv_obj_set_style_text_font(ui_TimeLabel, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Switch1, ui_event_Switch1, LV_EVENT_ALL, NULL);
 }
@@ -285,4 +294,5 @@ void ui_Screen5_screen_destroy(void)
     ui_CookModeNameLabelPower = NULL;
     ui_Switch1 = NULL;
     ui_Label39 = NULL;
+    ui_TimeLabel = NULL;
 }

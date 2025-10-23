@@ -213,6 +213,8 @@ extern "C"
 #define EVENT_UPDATA_MODE_SCT (1 << 4)
 #define EVENT_UPDATA_TIME (1 << 5)
 #define EVENT_MOTOR_WORK (1 << 6)
+#define EVENT_UPDATA_REAL_TIME (1 << 7)
+
 #ifdef __cplusplus
 }
 #endif

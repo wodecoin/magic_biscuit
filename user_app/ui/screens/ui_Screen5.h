@@ -7,40 +7,41 @@
 #define UI_SCREEN5_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// SCREEN: ui_Screen5
-extern void ui_Screen5_screen_init(void);
-extern void ui_Screen5_screen_destroy(void);
-extern lv_obj_t * ui_Screen5;
-extern lv_obj_t * ui_Container19;
-extern lv_obj_t * ui_Panel6;
-extern lv_obj_t * ui_PotLabel;
-extern lv_obj_t * ui_Panel9;
-extern lv_obj_t * ui_CookerDisplayTempLabel;
-extern lv_obj_t * ui_Panel10;
-extern lv_obj_t * ui_CookerDisplayPowerLabel;
-extern lv_obj_t * ui_Panel11;
-extern lv_obj_t * ui_Label25;
-extern lv_obj_t * ui_Container21;
-extern void ui_event_Button1(lv_event_t * e);
-extern lv_obj_t * ui_Button1;
-extern lv_obj_t * ui_Label28;
-extern lv_obj_t * ui_Panel12;
-extern lv_obj_t * ui_CookModeNameLabel;
-extern lv_obj_t * ui_Panel13;
-extern lv_obj_t * ui_CookModeNameLabelTime;
-extern lv_obj_t * ui_Panel14;
-extern lv_obj_t * ui_CookModeNameLabelPower;
-extern void ui_event_Switch1(lv_event_t * e);
-extern lv_obj_t * ui_Switch1;
-extern lv_obj_t * ui_Label39;
-// CUSTOM VARIABLES
+    // SCREEN: ui_Screen5
+    extern void ui_Screen5_screen_init(void);
+    extern void ui_Screen5_screen_destroy(void);
+    extern lv_obj_t *ui_Screen5;
+    extern lv_obj_t *ui_Container19;
+    extern lv_obj_t *ui_Panel6;
+    extern lv_obj_t *ui_PotLabel;
+    extern lv_obj_t *ui_Panel9;
+    extern lv_obj_t *ui_CookerDisplayTempLabel;
+    extern lv_obj_t *ui_Panel10;
+    extern lv_obj_t *ui_CookerDisplayPowerLabel;
+    extern lv_obj_t *ui_Panel11;
+    extern lv_obj_t *ui_Label25;
+    extern lv_obj_t *ui_Container21;
+    extern void ui_event_Button1(lv_event_t *e);
+    extern lv_obj_t *ui_Button1;
+    extern lv_obj_t *ui_Label28;
+    extern lv_obj_t *ui_Panel12;
+    extern lv_obj_t *ui_CookModeNameLabel;
+    extern lv_obj_t *ui_Panel13;
+    extern lv_obj_t *ui_CookModeNameLabelTime;
+    extern lv_obj_t *ui_Panel14;
+    extern lv_obj_t *ui_CookModeNameLabelPower;
+    extern void ui_event_Switch1(lv_event_t *e);
+    extern lv_obj_t *ui_Switch1;
+    extern lv_obj_t *ui_Label39;
+    extern lv_obj_t *ui_TimeLabel;
+    // CUSTOM VARIABLES
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
 #endif
-

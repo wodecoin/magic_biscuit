@@ -41,7 +41,7 @@ static const widget_tlv_map_t widget_map[] = {
     {WIDGET_AIR_FRY_MODE, TLV_COOK_MODE, NULL, EVENT_UPDATA_MODE_SCT, 1500},
     {WIDGET_AIR_FRY_START, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SW_SCT, 1500},
     {WIDGET_INDUCTION_COOKING_MODE, TYPE_COOKER_MODE_SELECT, NULL, EVENT_UPDATA_MODE_SCT, 1500},
-		{WIDGET_INDUCTION_COOKING_START, TYPE_COOKER_START, NULL, EVENT_UPDATA_MODE_SCT, 1500},
+    {WIDGET_INDUCTION_COOKING_START, TYPE_COOKER_START, NULL, EVENT_UPDATA_MODE_SCT, 1500},
 };
 
 #define RT_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -174,6 +174,11 @@ void thread_deal_task_entry(void *parameter)
             rt_kprintf("bus volt = %f \n", adc_value);
             adc_value = sliding_filter_process(&bat_adc_filter, adc_volt_read_single(ADC2, BAT_ADC_CH, 200, 200));
             rt_kprintf("bat volt = %f \n", adc_value);
+        }
+        if (tick_count % 1000 == 0)
+        {
+            rt_event_send(&env.ui_event, EVENT_UPDATA_REAL_TIME);
+            ds3231_get_time(&env.time);
         }
 
         if (rt_event_recv(&env.ui_event,
@@ -335,10 +340,11 @@ void lv_ui_deal(uint16_t ms)
     if (rt_event_recv(&env.ui_event,
                       EVENT_UPDATA_SLIDER1_SCT | EVENT_UPDATA_SLIDER2_SCT |
                           EVENT_UPDATA_SW_SCT | EVENT_UPDATA_MODE_SCT |
-                          EVENT_UPDATA_TIME,
+                          EVENT_UPDATA_TIME | EVENT_UPDATA_REAL_TIME,
                       RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                       RT_WAITING_NO, &e) == RT_EOK)
     {
+        char buf[16];
         if (e & EVENT_UPDATA_SLIDER1_SCT)
         {
             rt_kprintf("[UI_EVENT] Recv: SLIDER1_SCT (0x%08x)\n", e);
@@ -356,7 +362,6 @@ void lv_ui_deal(uint16_t ms)
         }
         if (e & EVENT_UPDATA_TIME)
         {
-            char buf[16];
             lv_obj_t *act_scr = lv_scr_act();
             ds3231_get_time(&env.time);
             rt_kprintf("[UI_EVENT] Recv: time (0x%08x) %02d:%02d:%02d\n", e, env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
@@ -374,6 +379,12 @@ void lv_ui_deal(uint16_t ms)
                 snprintf(buf, sizeof(buf), "%d", env.alarm.tm_sec);
                 lv_label_set_text(ui_ssLabel1, buf);
             }
+        }
+        if (e & EVENT_UPDATA_REAL_TIME)
+        {
+            snprintf(buf, sizeof(buf), "%d:%d:%d", env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
+            lv_label_set_text(ui_TimeLabel, buf);
+            lv_refresh_area_percent(0, 25, 100, 100);
         }
     }
     if (rt_mq_recv(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg), RT_WAITING_NO) == RT_EOK)
