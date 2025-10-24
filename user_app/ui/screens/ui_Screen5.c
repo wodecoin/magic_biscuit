@@ -41,7 +41,7 @@ void ui_event_Button1(lv_event_t *e)
 
         _ui_label_set_property(ui_CookModeNameLabel, _UI_LABEL_PROPERTY_TEXT, recipe_name[cur_recipe++]);
         if (cur_recipe == MODE_INDUCTION_MAX)
-            cur_recipe = MODE_STANDBY;
+            cur_recipe = MODE_KEEP_WARM;
         msg.widget_id = WIDGET_INDUCTION_COOKING_MODE;
         msg.event = EVT_AIR_FRY_MOED_CHANGE;
         msg.value = cur_recipe;

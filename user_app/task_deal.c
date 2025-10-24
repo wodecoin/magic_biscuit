@@ -369,11 +369,15 @@ void lv_ui_deal(uint16_t ms)
         }
         if (e & EVENT_UPDATA_REAL_TIME)
         {
-            snprintf(buf, sizeof(buf), "%d:%d:%d", env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
-            lv_label_set_text(ui_TimeLabel, buf);
-            snprintf(buf, sizeof(buf), "%0.1f| %0.2fV", env.base.charge_volt, env.base.bat_volt);
-            lv_label_set_text(ui_VoltLabel, buf);
-            lv_refresh_area_percent(15, 25, 100, 100);
+            lv_obj_t *act_scr = lv_scr_act();
+            if (act_scr == ui_Screen5)
+            {
+                snprintf(buf, sizeof(buf), "%d:%d:%d", env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
+                lv_label_set_text(ui_TimeLabel, buf);
+                snprintf(buf, sizeof(buf), "%0.1f| %0.2fV", env.base.charge_volt, env.base.bat_volt);
+                lv_label_set_text(ui_VoltLabel, buf);
+                lv_refresh_area_percent(0, 0, 100, 50);
+            }
         }
     }
     if (rt_mq_recv(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg), RT_WAITING_NO) == RT_EOK)

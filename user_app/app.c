@@ -89,24 +89,58 @@ const cooking_data_t cooking_table[] =
 
 const char *const recipe_name[] = RECIPE_NAME_TABLE;
 
-induction_cooking_data_t induction_cooking_table[] =
+static const induction_cooking_data_t induction_cooking_table[] =
     {
-        // 待机
+        // 保温模式
+        {
+            .recipe = MODE_KEEP_WARM,
+            .power = 50, // 50℃
+            .time = 0,   // 持续保温，不设时间
+            .countdown = 0,
+        },
+        // 火锅模式
+        {
+            .recipe = MODE_HOT_POT,
+            .power = 840,
+            .time = 60, // 默认 60 分钟
+            .countdown = 0,
+        },
+        // 爆炒模式
+        {
+            .recipe = MODE_STIR_FRY,
+            .power = 1200,
+            .time = 15, // 默认 15 分钟
+            .countdown = 0,
+        },
+        // 煎炸模式
+        {
+            .recipe = MODE_FRY,
+            .power = 1080,
+            .time = 20, // 默认 20 分钟
+            .countdown = 0,
+        },
+        // 煲汤模式
+        {
+            .recipe = MODE_SOUP,
+            .power = 480,
+            .time = 120, // 默认 120 分钟
+            .countdown = 0,
+        },
+        // 蒸煮模式
+        {
+            .recipe = MODE_STEAM,
+            .power = 840,
+            .time = 40, // 默认 40 分钟
+            .countdown = 0,
+        },
+        // 待机模式
         {
             .recipe = MODE_STANDBY,
             .power = 0,
             .time = 0,
             .countdown = 0,
         },
-        // 火锅
-        {
-            .recipe = MODE_HOT_POT,
-            .power = 180,
-            .time = 60,
-            .countdown = 0,
-        },
 };
-
 const char *const induction_cooking_recipe_name[] = INDUCTION_COOKING_NAME_TABLE;
 
 int pmu_init(void)

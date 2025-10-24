@@ -13,7 +13,7 @@ void thread_audio_task_entry(void *parameter)
 {
     rt_thread_mdelay(3000);
     rt_uint32_t e;
-
+    wt588f_init(&g_wt588f);
     LOG_D("thread_audio_task_entry");
     while (1)
     {
@@ -33,12 +33,12 @@ void thread_audio_task_entry(void *parameter)
             if (e & EVENT_PLAY_AUDIO)
             {
                 static uint8_t cnt = 1;
-                wt588f_init(&g_wt588f); // 必须初始化引脚 才能100% 播放，有点奇怪
+
                 LOG_I("[UI_EVENT] Recv: EVENT_PLAY_AUDIO (0x%08x)\n", e);
                 wt588f_play(&g_wt588f, cnt++);
                 if (cnt > 4)
                     cnt = 1;
-                wt588f_wait_finish(&g_wt588f, 2000);
+                wt588f_wait_finish(&g_wt588f, 1000);
                 wt588f_stop(&g_wt588f);
             }
         }

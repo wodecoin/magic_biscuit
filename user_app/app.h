@@ -34,18 +34,27 @@ extern "C"
   }
   typedef enum
   {
-    MODE_STANDBY = 0, // 待机
-    MODE_HOT_POT,     // 火锅
-    MODE_INDUCTION_MAX
+    MODE_KEEP_WARM = 0, // 保温：50℃
+    MODE_HOT_POT,       // 火锅：840W
+    MODE_STIR_FRY,      // 爆炒：1200W
+    MODE_FRY,           // 煎炸：1080W
+    MODE_SOUP,          // 煲汤：480W
+    MODE_STEAM,         // 蒸煮：840W
+    MODE_STANDBY,       // 待机
+    MODE_INDUCTION_MAX  // 模式数量
   } induction_cooking_recipes_t;
 
 // 对应食谱字符串数组（索引与枚举值一致）
-#define INDUCTION_COOKING_NAME_TABLE \
-  {                                  \
-      [MODE_STANDBY] = "STANDBY",    \
-      [MODE_HOT_POT] = "HOT PORT",   \
+#define INDUCTION_COOKING_NAME_TABLE  \
+  {                                   \
+      [MODE_KEEP_WARM] = "KEEP WARM", \
+      [MODE_HOT_POT] = "HOT POT",     \
+      [MODE_STIR_FRY] = "STIR FRY",   \
+      [MODE_FRY] = "FRY",             \
+      [MODE_SOUP] = "SOUP",           \
+      [MODE_STEAM] = "STEAM",         \
+      [MODE_STANDBY] = "STANDBY",     \
   }
-
   typedef struct
   {
     recipes_t recipe;          // 菜谱类型

@@ -39,7 +39,7 @@ void amoled_flush_area(const lv_area_t *area, lv_color_t *color_p)
     }
 
     rt_mutex_take(g_disp_mutex, RT_WAITING_FOREVER);
-    if (height <= 4) // 全局刷新
+    if (height <= 8) // 全局刷新
     {
         amoled_write_block(
             x1 + OFFSET_X, y1 + OFFSET_Y,
