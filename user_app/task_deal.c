@@ -36,12 +36,9 @@ typedef struct
 // --- 每个控件与TLV、函数的映射表 ---
 static uint8_t get_slider1_value(void) { return lv_slider_get_value(ui_Slider1); }
 static uint8_t get_slider2_value(void) { return lv_slider_get_value(ui_Slider2); }
-
+static uint8_t get_slider3_value(void) { return lv_slider_get_value(ui_Slider3); }
 static const widget_tlv_map_t widget_map[] = {
-    {WIDGET_AIR_FRY_TEMP, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SLIDER1_SCT, 1000},
-    {WIDGET_AIR_FRY_TIMER, TLV_HEAT_TIME, get_slider2_value, EVENT_UPDATA_SLIDER2_SCT, 1000},
-    {WIDGET_AIR_FRY_MODE, TLV_COOK_MODE, NULL, EVENT_UPDATA_MODE_SCT, 1500},
-    {WIDGET_AIR_FRY_START, TLV_MODE_TEMP, get_slider1_value, EVENT_UPDATA_SW_SCT, 1500},
+    {WIDGET_AIR_FRY_START, TLV_MODE_TEMP | TLV_HEAT_TIME, NULL, EVENT_UPDATA_SW_SCT, 1500},
     {WIDGET_INDUCTION_COOKING_MODE, TYPE_COOKER_MODE_SELECT, NULL, EVENT_UPDATA_MODE_SCT, 1500},
     {WIDGET_INDUCTION_COOKING_START, TYPE_COOKER_START, NULL, EVENT_UPDATA_MODE_SCT, 1500},
 };
@@ -91,59 +88,29 @@ void thread_deal_task_entry(void *parameter)
                     // 特殊处理 START：同时发送温度和时间
                     if (msg.widget_id == WIDGET_AIR_FRY_START)
                     {
-                        tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {get_slider1_value()}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_HEAT_TIME, 1, {get_slider2_value()}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TEMP, 1, {get_slider1_value()}};
+                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TIME, 1, {get_slider2_value()}};
+                        env.air_fry_ctl_dev.coutdown_time[0] = get_slider3_value();
+                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE1_TIME, 1, {env.air_fry_ctl_dev.coutdown_time[0]}};
                     }
-                    else if (msg.widget_id == WIDGET_AIR_FRY_MODE)
-                    {
-                        // ==========================
-                        // 设置分区温度
-                        // ==========================
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TEMP, 1, {cooking_table[msg.value].area_temp[0]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE2_TEMP, 1, {cooking_table[msg.value].area_temp[1]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE3_TEMP, 1, {cooking_table[msg.value].area_temp[2]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE4_TEMP, 1, {cooking_table[msg.value].area_temp[3]}};
-
-                        // ==========================
-                        // 设置分区时间
-                        // ==========================
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE1_TIME, 1, {cooking_table[msg.value].area_time[0]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE2_TIME, 1, {cooking_table[msg.value].area_time[1]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE3_TIME, 1, {cooking_table[msg.value].area_time[2]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_SET_ZONE4_TIME, 1, {cooking_table[msg.value].area_time[3]}};
-
-                        // ==========================
-                        // 设置分区预约时间
-                        // ==========================
-                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE1_TIME, 1, {cooking_table[msg.value].area_countdown[0]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE2_TIME, 1, {cooking_table[msg.value].area_countdown[1]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE3_TIME, 1, {cooking_table[msg.value].area_countdown[2]}};
-                        tlvs[tlv_count++] = (tlv_t){TLV_RESERVE_ZONE4_TIME, 1, {cooking_table[msg.value].area_countdown[3]}};
-                    }
-                    else if (msg.widget_id == WIDGET_INDUCTION_COOKING_MODE)
-                    {
-                        // tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {msg.value}};
-                        env.induction_cooking_ctl_dev.mode = msg.value;
-                    }
-                    else if (msg.widget_id == WIDGET_INDUCTION_COOKING_START)
-                    {
-                        tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {env.induction_cooking_ctl_dev.mode}};
-                        // tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_START, 1, {msg.value}};
-                    }
-                    // else
-                    // {
-                    //     tlvs[tlv_count++] = (tlv_t){map->tlv_type, 1, {map->get_value ? map->get_value() : msg.value}};
-                    // }
-
-                    // 延迟事件
-                    send_ui_event_delayed(map->delayed_event, map->delayed_time);
-                    break;
                 }
+                else if (msg.widget_id == WIDGET_INDUCTION_COOKING_MODE)
+                {
+                    env.induction_cooking_ctl_dev.mode = msg.value;
+                }
+                else if (msg.widget_id == WIDGET_INDUCTION_COOKING_START)
+                {
+                    tlvs[tlv_count++] = (tlv_t){TYPE_COOKER_MODE_SELECT, 1, {env.induction_cooking_ctl_dev.mode}};
+                }
+                // 延迟事件
+                send_ui_event_delayed(map->delayed_event, map->delayed_time);
+                break;
             }
+
             // 开始/停止特殊处理
-            if (msg.event == EVT_ON || msg.event == EVT_OFF)
+            if (msg.event == EVT_AIR_FRY_ON || msg.event == EVT_AIR_FRY_OFF)
             {
-                tlvs[tlv_count++] = (tlv_t){TLV_MODE_TEMP, 1, {(msg.event == EVT_ON) ? 1 : 0}};
+                tlvs[tlv_count++] = (tlv_t){TLV_EXEC_PARAM, 1, {(msg.event == EVT_AIR_FRY_ON) ? 1 : 0}};
             }
             else if (msg.event == EVT_INDUCTION_COOKING_ON || msg.event == EVT_INDUCTION_COOKING_OFF)
             {
@@ -153,7 +120,18 @@ void thread_deal_task_entry(void *parameter)
 
             // 统一发送 TLV
             if (tlv_count > 0)
-                send_tlv_settings(COOKING_DEV_TYPE, tlvs, tlv_count);
+            {
+
+                lv_obj_t *act_scr = lv_scr_act();
+                if (act_scr == ui_Screen1)
+                {
+                    send_tlv_settings(AIR_FRY_DEV_TYPE, tlvs, tlv_count);
+                }
+                else if (act_scr == ui_Screen5)
+                {
+                    send_tlv_settings(COOKING_DEV_TYPE, tlvs, tlv_count);
+                }
+            }
         }
 
         // 定时查询
@@ -261,18 +239,20 @@ static int do_1s_air_fry_query_cmd_generic(void)
     {
         // 查询分区温度
         ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_TEMP;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_TEMP;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_TEMP;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_TEMP;
-
         // 查询分区剩余时间
         ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE1_REMAIN;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE2_REMAIN;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE3_REMAIN;
-        ctl_tlvs[tlv_count++].type = TLV_QUERY_ZONE4_REMAIN;
+        // 查询分区剩余预约时间
+        ctl_tlvs[tlv_count++].type = TLV_RESERVE_ZONE1_TIME;
     }
     // 发送查询命令
-    send_query_cmd(COOKING_DEV_TYPE, ctl_tlvs, tlv_count);
+    if (act_scr == ui_Screen1)
+    {
+        send_query_cmd(AIR_FRY_DEV_TYPE, ctl_tlvs, tlv_count);
+    }
+    else if (act_scr == ui_Screen5)
+    {
+        send_query_cmd(COOKING_DEV_TYPE, ctl_tlvs, tlv_count);
+    }
 
     return 0;
 }
@@ -331,7 +311,7 @@ void lv_ui_deal(uint16_t ms)
                       RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                       RT_WAITING_NO, &e) == RT_EOK)
     {
-        char buf[16];
+        char buf[30];
         if (e & EVENT_UPDATA_SLIDER1_SCT)
         {
             rt_kprintf("[UI_EVENT] Recv: SLIDER1_SCT (0x%08x)\n", e);
@@ -347,26 +327,6 @@ void lv_ui_deal(uint16_t ms)
             rt_kprintf("[UI_EVENT] Recv: mode (0x%08x)\n", e);
             lv_refresh_area_percent(0, 0, 100, 25);
         }
-        if (e & EVENT_UPDATA_TIME)
-        {
-            lv_obj_t *act_scr = lv_scr_act();
-            ds3231_get_time(&env.time);
-            rt_kprintf("[UI_EVENT] Recv: time (0x%08x) %02d:%02d:%02d\n", e, env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
-            // screen2
-            if (act_scr == ui_Screen2)
-            {
-                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_year);
-                lv_label_set_text(ui_yyLabel1, buf);
-                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_mon);
-                lv_label_set_text(ui_mmLabel1, buf);
-                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_mday);
-                lv_label_set_text(ui_ddLabel1, buf);
-                snprintf(buf, sizeof(buf), "%d:%d", env.alarm.tm_hour, env.alarm.tm_min);
-                lv_label_set_text(ui_minLabel1, buf);
-                snprintf(buf, sizeof(buf), "%d", env.alarm.tm_sec);
-                lv_label_set_text(ui_ssLabel1, buf);
-            }
-        }
         if (e & EVENT_UPDATA_REAL_TIME)
         {
             lv_obj_t *act_scr = lv_scr_act();
@@ -376,8 +336,13 @@ void lv_ui_deal(uint16_t ms)
                 lv_label_set_text(ui_TimeLabel, buf);
                 snprintf(buf, sizeof(buf), "%0.1f| %0.2fV", env.base.charge_volt, env.base.bat_volt);
                 lv_label_set_text(ui_VoltLabel, buf);
-                lv_refresh_area_percent(0, 0, 100, 50);
             }
+            if (act_scr == ui_Screen2)
+            {
+                snprintf(buf, sizeof(buf), "%d:%d:%d:%d:%d:%d", env.time.tm_year + 1900, env.time.tm_mon, env.time.tm_yday, env.time.tm_hour, env.time.tm_min, env.time.tm_sec);
+                lv_label_set_text(ui_CurTimeLabel, buf);
+            }
+            lv_refresh_area_percent(0, 0, 100, 50);
         }
     }
     if (rt_mq_recv(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg), RT_WAITING_NO) == RT_EOK)
@@ -406,18 +371,18 @@ void ui_update_cb(void *param)
 
     if (msg->widget_id == WIDGET_AIR_FRY_DISPLAY)
     {
-        rt_kprintf("%0.1f %0.1f %0.1f", env.ctl_dev.kpa, env.ctl_dev.zone_real_temp[0], env.ctl_dev.rh_value);
+        rt_kprintf("%0.1f %0.1f %0.1f", env.air_fry_ctl_dev.kpa, env.air_fry_ctl_dev.zone_real_temp[0], env.air_fry_ctl_dev.rh_value);
         char buf[16];
         // screen1
         lv_obj_t *act_scr = lv_scr_act(); // 获取当前活动屏幕
 
         if (act_scr == ui_Screen1)
         {
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.kpa);
+            snprintf(buf, sizeof(buf), "%.1f", env.air_fry_ctl_dev.kpa);
             lv_label_set_text(ui_paLabel, buf);
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[0]);
+            snprintf(buf, sizeof(buf), "%.1f", env.air_fry_ctl_dev.zone_real_temp[0]);
             lv_label_set_text(ui_humidityLabel, buf);
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.rh_value);
+            snprintf(buf, sizeof(buf), "%.1f", env.air_fry_ctl_dev.rh_value);
             lv_label_set_text(ui_tempLabel, buf);
         }
 
@@ -430,28 +395,5 @@ void ui_update_cb(void *param)
             snprintf(buf, sizeof(buf), "%d", env.induction_cooking_ctl_dev.power);
             lv_label_set_text(ui_CookerDisplayPowerLabel, buf);
         }
-        // screen3
-        if (act_scr == ui_Screen3)
-        {
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[0]);
-            lv_label_set_text(ui_area1tempLabel, buf);
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[1]);
-            lv_label_set_text(ui_area1tempLabel2, buf);
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[2]);
-            lv_label_set_text(ui_area1tempLabel3, buf);
-            snprintf(buf, sizeof(buf), "%.1f", env.ctl_dev.zone_real_temp[3]);
-            lv_label_set_text(ui_area1tempLabel4, buf);
-
-            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[0]);
-            lv_label_set_text(ui_area1timeLabel1, buf);
-            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[1]);
-            lv_label_set_text(ui_area1timeLabel2, buf);
-            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[2]);
-            lv_label_set_text(ui_area1timeLabel3, buf);
-            snprintf(buf, sizeof(buf), "%d", env.ctl_dev.zone_remain_time[3]);
-            lv_label_set_text(ui_area1timeLabel4, buf);
-        }
-
-        lv_refresh_area_percent(0, 75, 50, 100); // 刷新1/4左下角
     }
 }

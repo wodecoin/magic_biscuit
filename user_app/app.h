@@ -66,9 +66,9 @@ extern "C"
   typedef struct
   {
     induction_cooking_recipes_t recipe; // 菜谱类型
-    uint8_t power;                      // 功率（w）
-    uint8_t time;                       // 运行时间（分钟）
-    uint8_t countdown;                  // 倒计时（分钟）
+    uint16_t power;                     // 功率（w）
+    uint16_t time;                      // 运行时间（分钟）
+    uint16_t countdown;                 // 倒计时（分钟）
   } induction_cooking_data_t;
   typedef enum
   {
@@ -108,8 +108,8 @@ extern "C"
     EVT_AIR_FRY_TIMER_CHANGE,
     EVT_AIR_FRY_DISPLAY_CHANGE,
     EVT_AIR_FRY_MOED_CHANGE,
-    EVT_ON,
-    EVT_OFF,
+    EVT_AIR_FRY_ON,
+    EVT_AIR_FRY_OFF,
     EVT_MUG_MODE_CHANGE
 
   } widget_event_t;
@@ -204,7 +204,7 @@ extern "C"
   typedef struct
   {
     struct base_dev_t base;
-    struct ctl_dev_t ctl_dev;
+    struct ctl_dev_t air_fry_ctl_dev;
     struct induction_cooking_ctl_dev_t induction_cooking_ctl_dev;
     struct device_config_t dev_conf;
     struct rt_event btn_event; // 按键 事件控制块
@@ -217,6 +217,7 @@ extern "C"
   extern env_t env;
   extern const char *const recipe_name[];
   extern const cooking_data_t cooking_table[];
+  extern const char *const induction_cooking_recipe_name[];
 
 #define EVENT_UPDATA_SLIDER1_SCT (1 << 1)
 #define EVENT_UPDATA_SLIDER2_SCT (1 << 2)

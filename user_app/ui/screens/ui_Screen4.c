@@ -12,12 +12,6 @@ lv_obj_t *ui_Chart2 = NULL;
 lv_obj_t *ui_Label59 = NULL;
 lv_obj_t *ui_Chart3 = NULL;
 lv_obj_t *ui_Label60 = NULL;
-lv_obj_t *ui_Container20 = NULL;
-lv_obj_t *ui_xaxisLabel6 = NULL;
-lv_obj_t *ui_xaxisLabel7 = NULL;
-lv_obj_t *ui_xaxisLabel8 = NULL;
-lv_obj_t *ui_xaxisLabel9 = NULL;
-lv_obj_t *ui_xaxisLabel10 = NULL;
 // event funtions
 void ui_event_Screen4(lv_event_t *e)
 {
@@ -31,7 +25,7 @@ void ui_event_Screen4(lv_event_t *e)
     if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT)
     {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen3_screen_init);
+        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen2_screen_init);
     }
 }
 
@@ -56,7 +50,6 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_y(ui_Chart1, -106);
     lv_obj_set_align(ui_Chart1, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_Chart1, LV_CHART_TYPE_LINE);
-    lv_chart_set_point_count(ui_Chart1, 10);
     lv_chart_set_range(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 300);
     lv_chart_set_range(ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 0, 300);
     lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 0, 5, 2, false, 50);
@@ -132,57 +125,6 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_style_text_opa(ui_Label60, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Label60, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Container20 = lv_obj_create(ui_Screen4);
-    lv_obj_remove_style_all(ui_Container20);
-    lv_obj_set_width(ui_Container20, 206);
-    lv_obj_set_height(ui_Container20, 13);
-    lv_obj_set_x(ui_Container20, 133);
-    lv_obj_set_y(ui_Container20, 193);
-    lv_obj_set_align(ui_Container20, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_Container20, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(ui_Container20, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_clear_flag(ui_Container20, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
-
-    ui_xaxisLabel6 = lv_label_create(ui_Container20);
-    lv_obj_set_width(ui_xaxisLabel6, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_xaxisLabel6, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_xaxisLabel6, 107);
-    lv_obj_set_y(ui_xaxisLabel6, 192);
-    lv_obj_set_align(ui_xaxisLabel6, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_xaxisLabel6, "1");
-
-    ui_xaxisLabel7 = lv_label_create(ui_Container20);
-    lv_obj_set_width(ui_xaxisLabel7, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_xaxisLabel7, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_xaxisLabel7, 107);
-    lv_obj_set_y(ui_xaxisLabel7, 192);
-    lv_obj_set_align(ui_xaxisLabel7, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_xaxisLabel7, "2");
-
-    ui_xaxisLabel8 = lv_label_create(ui_Container20);
-    lv_obj_set_width(ui_xaxisLabel8, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_xaxisLabel8, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_xaxisLabel8, 107);
-    lv_obj_set_y(ui_xaxisLabel8, 192);
-    lv_obj_set_align(ui_xaxisLabel8, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_xaxisLabel8, "3");
-
-    ui_xaxisLabel9 = lv_label_create(ui_Container20);
-    lv_obj_set_width(ui_xaxisLabel9, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_xaxisLabel9, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_xaxisLabel9, 107);
-    lv_obj_set_y(ui_xaxisLabel9, 192);
-    lv_obj_set_align(ui_xaxisLabel9, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_xaxisLabel9, "4");
-
-    ui_xaxisLabel10 = lv_label_create(ui_Container20);
-    lv_obj_set_width(ui_xaxisLabel10, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_xaxisLabel10, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_xaxisLabel10, 107);
-    lv_obj_set_y(ui_xaxisLabel10, 192);
-    lv_obj_set_align(ui_xaxisLabel10, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_xaxisLabel10, "5");
-
     lv_obj_add_event_cb(ui_Screen4, ui_event_Screen4, LV_EVENT_ALL, NULL);
 }
 
@@ -199,10 +141,4 @@ void ui_Screen4_screen_destroy(void)
     ui_Label59 = NULL;
     ui_Chart3 = NULL;
     ui_Label60 = NULL;
-    ui_Container20 = NULL;
-    ui_xaxisLabel6 = NULL;
-    ui_xaxisLabel7 = NULL;
-    ui_xaxisLabel8 = NULL;
-    ui_xaxisLabel9 = NULL;
-    ui_xaxisLabel10 = NULL;
 }

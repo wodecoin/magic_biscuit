@@ -7,59 +7,60 @@
 #define UI_SCREEN1_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// SCREEN: ui_Screen1
-extern void ui_Screen1_screen_init(void);
-extern void ui_Screen1_screen_destroy(void);
-extern void ui_event_Screen1(lv_event_t * e);
-extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Panel8;
-extern lv_obj_t * ui_Label15;
-extern lv_obj_t * ui_Container1;
-extern void ui_event_ButtonChips(lv_event_t * e);
-extern lv_obj_t * ui_ButtonChips;
-extern lv_obj_t * ui_Label3;
-extern lv_obj_t * ui_Container2;
-extern lv_obj_t * ui_humidityLabel;
-extern lv_obj_t * ui_Label16;
-extern lv_obj_t * ui_paLabel;
-extern lv_obj_t * ui_Label17;
-extern lv_obj_t * ui_tempLabel;
-extern lv_obj_t * ui_Label18;
-extern lv_obj_t * ui_Container3;
-extern void ui_event_Slider1(lv_event_t * e);
-extern lv_obj_t * ui_Slider1;
-extern lv_obj_t * ui_Label12;
-extern lv_obj_t * ui_Label13;
-extern void ui_event_TempAdd(lv_event_t * e);
-extern lv_obj_t * ui_TempAdd;
-extern lv_obj_t * ui_Label4;
-extern void ui_event_TempSub(lv_event_t * e);
-extern lv_obj_t * ui_TempSub;
-extern lv_obj_t * ui_Label5;
-extern lv_obj_t * ui_Label10;
-extern void ui_event_Slider2(lv_event_t * e);
-extern lv_obj_t * ui_Slider2;
-extern lv_obj_t * ui_Label11;
-extern lv_obj_t * ui_Label14;
-extern void ui_event_TimeAdd(lv_event_t * e);
-extern lv_obj_t * ui_TimeAdd;
-extern lv_obj_t * ui_Label6;
-extern void ui_event_TimeSub(lv_event_t * e);
-extern lv_obj_t * ui_TimeSub;
-extern lv_obj_t * ui_Label7;
-extern lv_obj_t * ui_Label9;
-extern lv_obj_t * ui_Container4;
-extern void ui_event_Switch2(lv_event_t * e);
-extern lv_obj_t * ui_Switch2;
-extern lv_obj_t * ui_Label8;
-// CUSTOM VARIABLES
+    // SCREEN: ui_Screen1
+    extern void ui_Screen1_screen_init(void);
+    extern void ui_Screen1_screen_destroy(void);
+    extern void ui_event_Screen1(lv_event_t *e);
+    extern lv_obj_t *ui_Screen1;
+    extern lv_obj_t *ui_Panel1;
+    extern lv_obj_t *ui_Panel2;
+    extern lv_obj_t *ui_Panel8;
+    extern lv_obj_t *ui_Label15;
+    extern lv_obj_t *ui_Container1;
+    extern void ui_event_ButtonChips(lv_event_t *e);
+    extern lv_obj_t *ui_ButtonChips;
+    extern lv_obj_t *ui_Label3;
+    extern lv_obj_t *ui_Container2;
+    extern lv_obj_t *ui_humidityLabel;
+    extern lv_obj_t *ui_Label16;
+    extern lv_obj_t *ui_paLabel;
+    extern lv_obj_t *ui_Label17;
+    extern lv_obj_t *ui_tempLabel;
+    extern lv_obj_t *ui_Label18;
+    extern void ui_event_Slider1(lv_event_t *e);
+    extern lv_obj_t *ui_Slider1;
+    extern lv_obj_t *ui_Label12;
+    extern lv_obj_t *ui_Label13;
+    extern lv_obj_t *ui_Label10;
+    extern void ui_event_TempAdd(lv_event_t *e);
+    extern lv_obj_t *ui_TempAdd;
+    extern lv_obj_t *ui_Label4;
+    extern void ui_event_TempSub(lv_event_t *e);
+    extern lv_obj_t *ui_TempSub;
+    extern lv_obj_t *ui_Label5;
+    extern lv_obj_t *ui_Label14;
+    extern lv_obj_t *ui_Label11;
+    extern void ui_event_Slider2(lv_event_t *e);
+    extern lv_obj_t *ui_Slider2;
+    extern lv_obj_t *ui_Label9;
+    extern void ui_event_TimeAdd(lv_event_t *e);
+    extern lv_obj_t *ui_TimeAdd;
+    extern lv_obj_t *ui_Label6;
+    extern void ui_event_TimeSub(lv_event_t *e);
+    extern lv_obj_t *ui_TimeSub;
+    extern lv_obj_t *ui_Label7;
+    extern lv_obj_t *ui_Container4;
+    extern void ui_event_Switch2(lv_event_t *e);
+    extern lv_obj_t *ui_Switch2;
+    extern lv_obj_t *ui_Label8;
+    // CUSTOM VARIABLES
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
 #endif
-

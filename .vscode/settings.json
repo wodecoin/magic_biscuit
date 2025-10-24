@@ -20,7 +20,9 @@
         "ulog.h": "c",
         "algorithm.h": "c",
         "tuple": "c",
-        "utility": "c"
+        "utility": "c",
+        "ui_screen5.h": "c",
+        "ui_screen4.h": "c"
     },
     "cmake.ignoreCMakeListsMissing": true,
     "idf.portWin": "COM14"

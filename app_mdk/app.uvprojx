@@ -485,11 +485,6 @@
               <FilePath>..\user_app\ui\screens\ui_Screen2.c</FilePath>
             </File>
             <File>
-              <FileName>ui_Screen3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user_app\ui\screens\ui_Screen3.c</FilePath>
-            </File>
-            <File>
               <FileName>ui_Screen4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user_app\ui\screens\ui_Screen4.c</FilePath>

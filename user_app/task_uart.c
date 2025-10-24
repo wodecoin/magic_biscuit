@@ -52,14 +52,14 @@ typedef struct
 //=== 控制响应 TLV 映射 ===
 static tlv_map_t ctrl_resp_tlv_map[] =
 	{
-		{TLV_SET_ZONE1_TEMP, &env.ctl_dev.set_temp[0]},
-		{TLV_SET_ZONE2_TEMP, &env.ctl_dev.set_temp[1]},
-		{TLV_SET_ZONE3_TEMP, &env.ctl_dev.set_temp[2]},
-		{TLV_SET_ZONE4_TEMP, &env.ctl_dev.set_temp[3]},
-		{TLV_SET_ZONE1_TIME, &env.ctl_dev.set_time[0]},
-		{TLV_SET_ZONE2_TIME, &env.ctl_dev.set_time[1]},
-		{TLV_SET_ZONE3_TIME, &env.ctl_dev.set_time[2]},
-		{TLV_SET_ZONE4_TIME, &env.ctl_dev.set_time[3]},
+		{TLV_SET_ZONE1_TEMP, &env.air_fry_ctl_dev.set_temp[0]},
+		{TLV_SET_ZONE2_TEMP, &env.air_fry_ctl_dev.set_temp[1]},
+		{TLV_SET_ZONE3_TEMP, &env.air_fry_ctl_dev.set_temp[2]},
+		{TLV_SET_ZONE4_TEMP, &env.air_fry_ctl_dev.set_temp[3]},
+		{TLV_SET_ZONE1_TIME, &env.air_fry_ctl_dev.set_time[0]},
+		{TLV_SET_ZONE2_TIME, &env.air_fry_ctl_dev.set_time[1]},
+		{TLV_SET_ZONE3_TIME, &env.air_fry_ctl_dev.set_time[2]},
+		{TLV_SET_ZONE4_TIME, &env.air_fry_ctl_dev.set_time[3]},
 		{TYPE_COOKER_MODE_SELECT, &env.induction_cooking_ctl_dev.mode},
 
 };
@@ -68,16 +68,17 @@ static tlv_map_t ctrl_resp_tlv_map[] =
 // 代码更模块化、可维护性更强(方便增加/修改 TLV)
 static tlv_map_t query_resp_tlv_map[] =
 	{
-		{TLV_QUERY_ZONE1_TEMP, &env.ctl_dev.zone_real_temp[0]},
-		{TLV_QUERY_ZONE2_TEMP, &env.ctl_dev.zone_real_temp[1]},
-		{TLV_QUERY_ZONE3_TEMP, &env.ctl_dev.zone_real_temp[2]},
-		{TLV_QUERY_ZONE4_TEMP, &env.ctl_dev.zone_real_temp[3]},
-		{TLV_QUERY_ZONE1_REMAIN, &env.ctl_dev.zone_remain_time[0]},
-		{TLV_QUERY_ZONE2_REMAIN, &env.ctl_dev.zone_remain_time[1]},
-		{TLV_QUERY_ZONE3_REMAIN, &env.ctl_dev.zone_remain_time[2]},
-		{TLV_QUERY_ZONE4_REMAIN, &env.ctl_dev.zone_remain_time[3]},
-		{TLV_KPA, &env.ctl_dev.kpa},
-		{TLV_RH, &env.ctl_dev.rh_value},
+		{TLV_QUERY_ZONE1_TEMP, &env.air_fry_ctl_dev.zone_real_temp[0]},
+		{TLV_QUERY_ZONE2_TEMP, &env.air_fry_ctl_dev.zone_real_temp[1]},
+		{TLV_QUERY_ZONE3_TEMP, &env.air_fry_ctl_dev.zone_real_temp[2]},
+		{TLV_QUERY_ZONE4_TEMP, &env.air_fry_ctl_dev.zone_real_temp[3]},
+		{TLV_QUERY_ZONE1_REMAIN, &env.air_fry_ctl_dev.zone_remain_time[0]},
+		{TLV_QUERY_ZONE2_REMAIN, &env.air_fry_ctl_dev.zone_remain_time[1]},
+		{TLV_QUERY_ZONE3_REMAIN, &env.air_fry_ctl_dev.zone_remain_time[2]},
+		{TLV_QUERY_ZONE4_REMAIN, &env.air_fry_ctl_dev.zone_remain_time[3]},
+		{TLV_RESERVE_ZONE1_TIME, &env.air_fry_ctl_dev.coutdown_time[0]},
+		{TLV_KPA, &env.air_fry_ctl_dev.kpa},
+		{TLV_RH, &env.air_fry_ctl_dev.rh_value},
 
 		{TYPE_COOKER_POT_DETECT, &env.induction_cooking_ctl_dev.pot_detect},
 		{TLV_MODE_TEMP, &env.induction_cooking_ctl_dev.temperature},
@@ -140,7 +141,7 @@ void thread_uart_task_entry(void *parameter)
 					{
 					case FRAME_CTRL_RESP:
 						parse_tlv_by_map(&recv_frame, ctrl_resp_tlv_map, RT_ARRAY_SIZE(ctrl_resp_tlv_map));
-						LOG_I("receive ctrl resp, set_temp=%d", env.ctl_dev.set_temp);
+						LOG_I("receive ctrl resp, set_temp=%d", env.air_fry_ctl_dev.set_temp);
 						break;
 
 					case FRAME_QUERY_RESP:
@@ -201,9 +202,9 @@ static void ui_updata(int argc, char **argv)
 {
 	display_msg_t dmsg;
 	dmsg.widget_id = WIDGET_AIR_FRY_DISPLAY;
-	env.ctl_dev.zone_real_temp[0] = 50.1f;
-	env.ctl_dev.kpa = 50.2f;
-	env.ctl_dev.rh_value = 50.3f;
+	env.air_fry_ctl_dev.zone_real_temp[0] = 50.1f;
+	env.air_fry_ctl_dev.kpa = 50.2f;
+	env.air_fry_ctl_dev.rh_value = 50.3f;
 
 	rt_err_t ret = rt_mq_send(&env.bt_rev_msg_queue, &dmsg, sizeof(dmsg));
 	if (ret == RT_EOK)
